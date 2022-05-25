@@ -58,6 +58,4 @@ app.*.map.json
 *.vsix
 
 android/app/src/main/AndroidManifest.xml
-.gitignore
 ios/Runner/AppDelegate.swift
-.gitignore
