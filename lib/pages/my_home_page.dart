@@ -1,3 +1,5 @@
+import 'package:earthquake_app/pages/earthquake_list_page.dart';
+import 'package:earthquake_app/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'google_map_page.dart';
 
@@ -21,16 +23,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screens = [
+      const GoogleMapPage(),
+      const EarthquakeListPage(),
+      const SettingsPage(),
+    ];
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Map',
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: const GoogleMapPage(),
+      body: screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
