@@ -57,5 +57,4 @@ app.*.map.json
 # Built Visual Studio Code Extensions
 *.vsix
 
-android/app/src/main/AndroidManifest.xml
-ios/Runner/AppDelegate.swift
+
