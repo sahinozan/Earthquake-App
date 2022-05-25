@@ -1,3 +1,4 @@
+import 'package:earthquake_app/pages/language_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -31,7 +32,14 @@ class SettingsPage extends ConsumerWidget {
                 title: const Text('Language'),
                 value: const Text('English'),
                 leading: const Icon(Icons.language),
-                onPressed: null,
+                onPressed: (value) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LanguageSettingsPage(),
+                    ),
+                  );
+                },
               ),
               SettingsTile.switchTile(
                 initialValue: ref.watch(darkModeProvider),

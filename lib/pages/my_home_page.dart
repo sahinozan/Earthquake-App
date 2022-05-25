@@ -3,25 +3,20 @@ import 'package:earthquake_app/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:earthquake_app/pages/google_map_page.dart';
 import 'package:animations/animations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MyHomePage extends StatefulWidget {
+final bottomNavigationBarProvider = StateProvider((ref) => 0);
+
+class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
+class _MyHomePageState extends ConsumerState<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final screens = [
@@ -39,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: child,
           );
         },
-        child: screens[_selectedIndex],
+        child: screens[ref.watch(bottomNavigationBarProvider)],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -56,9 +51,11 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Settings',
           ),
         ],
-        currentIndex: _selectedIndex,
+        currentIndex: ref.watch(bottomNavigationBarProvider),
         selectedItemColor: Colors.amber,
-        onTap: _onItemTapped,
+        onTap: (value) {
+          ref.read(bottomNavigationBarProvider.notifier).state = value;
+        },
       ),
     );
   }
