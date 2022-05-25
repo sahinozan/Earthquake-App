@@ -57,4 +57,4 @@ app.*.map.json
 # Built Visual Studio Code Extensions
 *.vsix
 
-
+earthquake_app/ios/Runner/AppDelegate.swift
