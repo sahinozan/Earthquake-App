@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'google_map_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -29,14 +30,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: ColoredBox(
-        color: Colors.grey.shade200,
-        child: Center(
-          child: Column(
-            children: const [],
-          ),
-        ),
-      ),
+      body: const GoogleMapPage(),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
