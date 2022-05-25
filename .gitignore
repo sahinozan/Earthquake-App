@@ -56,3 +56,8 @@ app.*.map.json
 .history/
 # Built Visual Studio Code Extensions
 *.vsix
+
+android/app/src/main/AndroidManifest.xml
+.gitignore
+ios/Runner/AppDelegate.swift
+.gitignore
