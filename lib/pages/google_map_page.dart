@@ -11,7 +11,7 @@ class GoogleMapPage extends StatelessWidget {
     return const GoogleMap(
       initialCameraPosition: CameraPosition(
         target: LatLng(37.7749, -122.4194),
-        zoom: 11.0,
+        zoom: 9.0,
       ),
     );
   }

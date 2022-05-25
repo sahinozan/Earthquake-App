@@ -1,7 +1,8 @@
 import 'package:earthquake_app/pages/earthquake_list_page.dart';
 import 'package:earthquake_app/pages/settings_page.dart';
 import 'package:flutter/material.dart';
-import 'google_map_page.dart';
+import 'package:earthquake_app/pages/google_map_page.dart';
+import 'package:animations/animations.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -29,7 +30,17 @@ class _MyHomePageState extends State<MyHomePage> {
       const SettingsPage(),
     ];
     return Scaffold(
-      body: screens[_selectedIndex],
+      body: PageTransitionSwitcher(
+        transitionBuilder: (child, animation, secondaryAnimation) {
+          return SharedAxisTransition(
+            animation: animation,
+            secondaryAnimation: secondaryAnimation,
+            transitionType: SharedAxisTransitionType.horizontal,
+            child: child,
+          );
+        },
+        child: screens[_selectedIndex],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -37,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Map',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.list),
             label: 'List',
           ),
           BottomNavigationBarItem(

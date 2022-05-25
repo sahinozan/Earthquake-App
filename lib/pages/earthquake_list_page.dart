@@ -9,10 +9,10 @@ class EarthquakeListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        actionsIconTheme: const IconThemeData(
+        iconTheme: const IconThemeData(
           color: Colors.black,
         ),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
           'Earthquake List',
@@ -33,7 +33,15 @@ class EarthquakeListPage extends StatelessWidget {
             title: const Text('Earthquake'),
             subtitle: const Text('Earthquake description'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => const AlertDialog(
+                  title: Text('Earthquake'),
+                  content: Text('Magnitude: 5.6'),
+                ),
+              );
+            },
             leading: DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),

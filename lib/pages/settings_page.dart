@@ -13,6 +13,9 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
+        iconTheme: const IconThemeData(
+          color: Colors.black,
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
@@ -28,16 +31,19 @@ class SettingsPage extends ConsumerWidget {
                 title: const Text('Language'),
                 value: const Text('English'),
                 leading: const Icon(Icons.language),
+                onPressed: null,
               ),
               SettingsTile.switchTile(
                 initialValue: ref.watch(darkModeProvider),
-                onToggle: (value) => ref.read(darkModeProvider.notifier).state = value,
+                onToggle: (value) =>
+                    ref.read(darkModeProvider.notifier).state = value,
                 title: const Text('Dark Mode'),
                 leading: const Icon(Icons.brightness_2),
               ),
               SettingsTile.switchTile(
                 initialValue: ref.watch(measurementProvider),
-                onToggle: (value) => ref.read(measurementProvider.notifier).state = value,
+                onToggle: (value) =>
+                    ref.read(measurementProvider.notifier).state = value,
                 title: const Text('Measurement System'),
                 leading: const Icon(Icons.architecture),
               ),
