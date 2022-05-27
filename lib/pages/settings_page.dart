@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 final languageProvider = StateProvider((ref) => 'English');
-final darkModeProvider = StateProvider((ref) => false);
+final indexProvider = StateProvider((ref) => 0);
+final languageSettingsButtonProvider = StateProvider((ref) => 1);
 final measurementProvider = StateProvider((ref) => false);
+final darkModeProvider = StateProvider((ref) => false);
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -16,6 +18,7 @@ class SettingsPage extends ConsumerWidget {
       (ref) => Theme.of(context).brightness == Brightness.dark,
     );
     final isDarkMode = ref.watch(darkThemeProvider);
+    final selectedLanguage = ref.watch(languageProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -37,7 +40,7 @@ class SettingsPage extends ConsumerWidget {
             tiles: [
               SettingsTile.navigation(
                 title: const Text('Language'),
-                value: const Text('English'),
+                value: Text(selectedLanguage),
                 leading: const Icon(Icons.language),
                 onPressed: (value) {
                   Navigator.push(

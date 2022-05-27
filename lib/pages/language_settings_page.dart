@@ -1,18 +1,28 @@
-import 'package:earthquake_app/pages/my_home_page.dart';
 import 'package:earthquake_app/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LanguageSettingsPage extends ConsumerWidget {
-  const LanguageSettingsPage({Key? key}) : super(key: key);
+class LanguageSettingsPage extends ConsumerStatefulWidget {
+  const LanguageSettingsPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LanguageSettingsPage> createState() =>
+      _LanguageSettingsPageState();
+}
+
+class _LanguageSettingsPageState extends ConsumerState<LanguageSettingsPage> {
+  @override
+  Widget build(BuildContext context) {
     final darkThemeProvider = StateProvider(
       (ref) => Theme.of(context).brightness == Brightness.dark,
     );
     final isDarkMode = ref.watch(darkThemeProvider);
     final languages = ['English', 'Turkish'];
+    final selectedRadioButton =
+        ref.watch(languageSettingsButtonProvider.notifier);
+    int selectedItem = ref.watch(indexProvider.notifier).state;
 
     return Scaffold(
       appBar: AppBar(
@@ -35,10 +45,19 @@ class LanguageSettingsPage extends ConsumerWidget {
             return ListTile(
               title: Text(languages[index]),
               trailing: Radio(
-                value: languages[index],
-                groupValue: ref.read(languageProvider.notifier).state,
-                onChanged: (String? value) =>
-                    ref.read(languageProvider.notifier).state != value,
+                value:
+                    selectedRadioButton.state == index ? index : selectedItem,
+                groupValue:
+                    selectedRadioButton.state == index ? selectedItem : index,
+                onChanged: (value) {
+                  ref.read(languageSettingsButtonProvider.notifier).state =
+                      index;
+                  ref.read(languageProvider.notifier).state = languages[index];
+                  ref.read(indexProvider.notifier).state = index;
+                  setState(() {
+                    selectedItem = index;
+                  });
+                },
               ),
               onTap: () {},
             );
