@@ -1,3 +1,5 @@
+import 'package:earthquake_app/pages/my_home_page.dart';
+import 'package:earthquake_app/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +12,7 @@ class LanguageSettingsPage extends ConsumerWidget {
       (ref) => Theme.of(context).brightness == Brightness.dark,
     );
     final isDarkMode = ref.watch(darkThemeProvider);
+    final languages = ['English', 'Turkish'];
 
     return Scaffold(
       appBar: AppBar(
@@ -25,7 +28,29 @@ class LanguageSettingsPage extends ConsumerWidget {
           ),
         ),
       ),
-      body: const Center(),
+      body: ColoredBox(
+        color: const Color(0xff1b1b1b),
+        child: ListView.separated(
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(languages[index]),
+              trailing: Radio(
+                value: languages[index],
+                groupValue: ref.read(languageProvider.notifier).state,
+                onChanged: (String? value) =>
+                    ref.read(languageProvider.notifier).state != value,
+              ),
+              onTap: () {},
+            );
+          },
+          separatorBuilder: (context, index) {
+            return Divider(
+              color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
+            );
+          },
+          itemCount: 2,
+        ),
+      ),
     );
   }
 }
