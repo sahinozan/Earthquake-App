@@ -6,16 +6,23 @@ class LanguageSettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final darkThemeProvider = StateProvider(
+      (ref) => Theme.of(context).brightness == Brightness.dark,
+    );
+    final isDarkMode = ref.watch(darkThemeProvider);
+
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(
-          color: Colors.black,
+        iconTheme: IconThemeData(
+          color: isDarkMode ? Colors.white : Colors.black,
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Settings',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
         ),
       ),
       body: const Center(),
