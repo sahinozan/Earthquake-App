@@ -57,6 +57,18 @@ class _LanguageSettingsPageState extends ConsumerState<LanguageSettingsPage> {
                   setState(() {
                     selectedItem = index;
                   });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '${languages[index]} selected',
+                        style: const TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      backgroundColor: Colors.grey.shade800,
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
                 },
               ),
               onTap: () {},
@@ -65,6 +77,7 @@ class _LanguageSettingsPageState extends ConsumerState<LanguageSettingsPage> {
           separatorBuilder: (context, index) {
             return Divider(
               color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
+              height: 0,
             );
           },
           itemCount: 2,
