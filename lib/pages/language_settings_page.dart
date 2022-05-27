@@ -65,6 +65,9 @@ class _LanguageSettingsPageState extends ConsumerState<LanguageSettingsPage> {
                           color: Colors.white,
                         ),
                       ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       backgroundColor: Colors.grey.shade800,
                       duration: const Duration(seconds: 1),
                     ),
