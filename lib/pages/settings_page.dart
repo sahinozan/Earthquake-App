@@ -1,3 +1,4 @@
+import 'package:earthquake_app/main.dart';
 import 'package:earthquake_app/pages/language_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,11 +10,16 @@ final languageSettingsButtonProvider = StateProvider((ref) => 1);
 final measurementProvider = StateProvider((ref) => false);
 final darkModeProvider = StateProvider((ref) => false);
 
-class SettingsPage extends ConsumerWidget {
+class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends ConsumerState<SettingsPage> {
+  @override
+  Widget build(BuildContext context) {
     final darkThemeProvider = StateProvider(
       (ref) => Theme.of(context).brightness == Brightness.dark,
     );
@@ -53,8 +59,18 @@ class SettingsPage extends ConsumerWidget {
               ),
               SettingsTile.switchTile(
                 initialValue: ref.watch(darkModeProvider),
-                onToggle: (value) =>
-                    ref.read(darkModeProvider.notifier).state = value,
+                onToggle: (value) {
+                  ref.read(darkModeProvider.notifier).state = value;
+                  if (value) {
+                    setState(() {
+                      MyApp.of(context)!.changeTheme(ThemeMode.dark);
+                    });
+                  } else {
+                    setState(() {
+                      MyApp.of(context)!.changeTheme(ThemeMode.light);
+                    });
+                  }
+                },
                 title: const Text('Dark Mode'),
                 leading: const Icon(Icons.brightness_2),
               ),
