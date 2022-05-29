@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'earthquakes_page.dart';
 
 class GoogleMapPage extends StatefulWidget {
   const GoogleMapPage({
@@ -19,29 +19,37 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
 
   void createAllMarkers() {
     allMarkers.clear();
-    allMarkers.add(const Marker(
-      markerId: MarkerId('1'),
-      position: LatLng(37.7749, -122.4194),
-      infoWindow: InfoWindow(
-        title: 'San Francisco',
-        snippet: 'Population: 77,000,000',
-      ),
-      icon: BitmapDescriptor.defaultMarker,
-    ));
+    for (int i = 0; i < earthquakeList.length; i++) {
+      allMarkers.addAll(
+        earthquakeList.map(
+          (earthquake) => Marker(
+            markerId: MarkerId(earthquake.features[i].id),
+            position: LatLng(earthquake.features[i].geometry.coordinates[0],
+                earthquake.features[i].geometry.coordinates[1]),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueYellow,
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    createAllMarkers();
   }
 
   @override
   Widget build(BuildContext context) {
-    return const GoogleMap(
-      initialCameraPosition: CameraPosition(
+    for (int i = 0; i < 50; i++) print(allMarkers);
+    return GoogleMap(
+      initialCameraPosition: const CameraPosition(
         target: LatLng(37.7749, -122.4194),
         zoom: 9.0,
       ),
+      markers: Set.from(allMarkers),
     );
   }
 }

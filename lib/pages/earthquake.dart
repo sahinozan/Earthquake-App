@@ -17,15 +17,18 @@ class Earthquake {
 
 class Feature {
   Properties properties;
+  Geometry geometry;
   String id;
 
   Feature({
     required this.properties,
     required this.id,
+    required this.geometry,
   });
 
   factory Feature.fromJson(Map<String, dynamic> json) => Feature(
         properties: Properties.fromJson(json["properties"]),
+        geometry: Geometry.fromJson(json["geometry"]),
         id: json["id"],
       );
 }
@@ -61,4 +64,17 @@ class Properties {
       return place;
     }
   }
+}
+
+class Geometry {
+  List<double> coordinates;
+
+  Geometry({
+    required this.coordinates,
+  });
+
+  factory Geometry.fromJson(Map<String, dynamic> json) => Geometry(
+        coordinates:
+            List<double>.from(json["coordinates"].map((x) => x.toDouble())),
+      );
 }

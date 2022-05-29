@@ -18,6 +18,8 @@ Future<Earthquake> fetchEarthquake() async {
   }
 }
 
+var earthquakeList = <Earthquake>[];
+
 class EarthquakesPage extends ConsumerStatefulWidget {
   const EarthquakesPage({Key? key}) : super(key: key);
 
@@ -81,28 +83,48 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
             if (snapshot.hasData) {
               return ListView.separated(
                 itemBuilder: (BuildContext context, int index) {
+                  earthquakeList.add(snapshot.data!);
                   return ListTile(
                     title: Text(
                       snapshot.data!.features[index].properties.place
-                              .contains(' of')
+                              .contains(' of ')
                           ? snapshot.data!.features[index].properties.place
-                              .split(' of')[1]
+                              .split(' of ')[1]
                           : snapshot.data!.features[index].properties.place,
                     ),
-                    subtitle: Text(
-                      DateFormat.yMMMd().format(DateTime.fromMillisecondsSinceEpoch(snapshot.data!.features[index].properties.time)),
+                    subtitle: Row(
+                      children: [
+                        Text(
+                          DateFormat.yMMMd().format(
+                              DateTime.fromMillisecondsSinceEpoch(snapshot
+                                  .data!.features[index].properties.time)),
+                        ),
+                        Text(snapshot
+                                .data!.features[index].geometry.coordinates[0]
+                                .toString() +
+                            ',' +
+                            snapshot
+                                .data!.features[index].geometry.coordinates[1]
+                                .toString()),
+                      ],
                     ),
-                    trailing: ColoredBox(
-                      color: magnitudeColors(
-                          snapshot.data!.features[index].properties.mag),
+                    trailing: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: magnitudeColors(
+                            snapshot.data!.features[index].properties.mag),
+                      ),
                       child: SizedBox(
-                        width: 40,
-                        height: 40,
+                        width: 50,
+                        height: 50,
                         child: Center(
                           child: Text(
                             snapshot.data!.features[index].properties.mag
                                 .toString(),
-                            style: const TextStyle(fontSize: 18),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                       ),
