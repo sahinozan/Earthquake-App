@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 
 Future<Earthquake> fetchEarthquake() async {
   final response = await http.get(Uri.parse(
-      'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=100'));
+      'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=200'));
 
   if (response.statusCode == 200) {
     return Earthquake.fromJson(json.decode(response.body));
@@ -92,21 +92,10 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                               .split(' of ')[1]
                           : snapshot.data!.features[index].properties.place,
                     ),
-                    subtitle: Row(
-                      children: [
-                        Text(
-                          DateFormat.yMMMd().format(
-                              DateTime.fromMillisecondsSinceEpoch(snapshot
-                                  .data!.features[index].properties.time)),
-                        ),
-                        Text(snapshot
-                                .data!.features[index].geometry.coordinates[0]
-                                .toString() +
-                            ',' +
-                            snapshot
-                                .data!.features[index].geometry.coordinates[1]
-                                .toString()),
-                      ],
+                    subtitle: Text(
+                      DateFormat.yMMMd().add_jms().format(
+                          DateTime.fromMillisecondsSinceEpoch(snapshot
+                              .data!.features[index].properties.time)),
                     ),
                     trailing: DecoratedBox(
                       decoration: BoxDecoration(
