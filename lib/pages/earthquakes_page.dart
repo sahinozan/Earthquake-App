@@ -1,10 +1,9 @@
-import 'package:earthquake_app/pages/earthquake.dart';
+import 'package:earthquake_app/earthquake.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
-
 import 'package:intl/intl.dart';
 
 Future<Earthquake> fetchEarthquake() async {
