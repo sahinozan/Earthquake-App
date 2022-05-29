@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:intl/intl.dart';
+
 Future<Earthquake> fetchEarthquake() async {
   final response = await http.get(Uri.parse(
       'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=100'));
@@ -31,6 +33,18 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
   void initState() {
     super.initState();
     futureEarthquake = fetchEarthquake();
+  }
+
+  Color magnitudeColors(double mag) {
+    if (mag < 5) {
+      return Colors.green;
+    } else if (mag < 5.5) {
+      return Colors.yellow;
+    } else if (mag < 6) {
+      return Colors.orange;
+    } else {
+      return Colors.red;
+    }
   }
 
   @override
@@ -76,10 +90,11 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                           : snapshot.data!.features[index].properties.place,
                     ),
                     subtitle: Text(
-                      '${snapshot.data!.features[index].properties.time}',
+                      DateFormat.yMMMd().format(DateTime.fromMillisecondsSinceEpoch(snapshot.data!.features[index].properties.time)),
                     ),
                     trailing: ColoredBox(
-                      color: Colors.red,
+                      color: magnitudeColors(
+                          snapshot.data!.features[index].properties.mag),
                       child: SizedBox(
                         width: 40,
                         height: 40,

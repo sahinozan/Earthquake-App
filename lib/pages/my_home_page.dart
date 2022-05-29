@@ -1,4 +1,3 @@
-import 'package:earthquake_app/pages/earthquake_list_page.dart';
 import 'package:earthquake_app/pages/earthquakes_page.dart';
 import 'package:earthquake_app/pages/settings_page.dart';
 import 'package:flutter/material.dart';
