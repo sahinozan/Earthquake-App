@@ -1,4 +1,5 @@
 import 'package:earthquake_app/pages/earthquake_list_page.dart';
+import 'package:earthquake_app/pages/earthquakes_page.dart';
 import 'package:earthquake_app/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:earthquake_app/pages/google_map_page.dart';
@@ -21,7 +22,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   Widget build(BuildContext context) {
     final screens = [
       const GoogleMapPage(),
-      const EarthquakeListPage(),
+      // const EarthquakeListPage(),
+      const EarthquakesPage(),
       const SettingsPage(),
     ];
     return Scaffold(
