@@ -39,7 +39,7 @@ class _LanguageSettingsPageState extends ConsumerState<LanguageSettingsPage> {
         ),
       ),
       body: ColoredBox(
-        color: const Color(0xff1b1b1b),
+        color: isDarkMode ? const Color(0xff1b1b1b) : const Color(0xfff0f0f0),
         child: ListView.separated(
           itemBuilder: (context, index) {
             return ListTile(
@@ -64,9 +64,6 @@ class _LanguageSettingsPageState extends ConsumerState<LanguageSettingsPage> {
                         style: const TextStyle(
                           color: Colors.white,
                         ),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
                       ),
                       backgroundColor: Colors.grey.shade800,
                       duration: const Duration(seconds: 1),
