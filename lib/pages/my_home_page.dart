@@ -21,7 +21,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   Widget build(BuildContext context) {
     final screens = [
       const GoogleMapPage(),
-      // const EarthquakeListPage(),
       const EarthquakesPage(),
       const SettingsPage(),
     ];

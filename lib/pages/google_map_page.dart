@@ -43,7 +43,6 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
 
   @override
   Widget build(BuildContext context) {
-    for (int i = 0; i < 50; i++) print(allMarkers);
     return GoogleMap(
       initialCameraPosition: const CameraPosition(
         target: LatLng(37.7749, -122.4194),
