@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'earthquakes_page.dart';
 
 class GoogleMapPage extends StatefulWidget {
   const GoogleMapPage({
@@ -17,9 +17,21 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
 
   Set<Marker> allMarkers = {};
 
+  Future<void> _onMapCreated(GoogleMapController controller) async {
+    mapController = controller;
+    mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: center,
+          zoom: 1.0,
+        ),
+      ),
+    );
+  }
+  /*
   void createAllMarkers() {
     allMarkers.clear();
-    for (int i = 0; i < earthquakeList.length; i++) {
+    for (int i = 0; i < 100; i++) {
       allMarkers.addAll(
         earthquakeList.map(
           (earthquake) => Marker(
@@ -34,19 +46,39 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
       );
     }
   }
+  */
+
+  void createAllMarkers1() {
+    allMarkers.clear();
+    FirebaseFirestore.instance.collection('earthquakes').get().then(
+          (res) => res.docs.forEach(
+            (doc) => allMarkers.add(
+              Marker(
+                markerId: MarkerId(doc.get('id')),
+                position: LatLng(
+                    doc.get('coordinates')[0], doc.get('coordinates')[1]),
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueYellow,
+                ),
+              ),
+            ),
+          ),
+        );
+  }
 
   @override
   void initState() {
     super.initState();
-    createAllMarkers();
+    createAllMarkers1();
   }
 
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
-      initialCameraPosition: const CameraPosition(
-        target: LatLng(37.7749, -122.4194),
-        zoom: 9.0,
+      onMapCreated: _onMapCreated,
+      initialCameraPosition: CameraPosition(
+        target: center,
+        zoom: 1.0,
       ),
       markers: Set.from(allMarkers),
     );

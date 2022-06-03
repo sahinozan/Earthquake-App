@@ -27,6 +27,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     return Scaffold(
       body: PageTransitionSwitcher(
         transitionBuilder: (child, animation, secondaryAnimation) {
+          earthquakeList.clear();
           return SharedAxisTransition(
             animation: animation,
             secondaryAnimation: secondaryAnimation,

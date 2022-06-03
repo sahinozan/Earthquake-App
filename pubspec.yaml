@@ -40,6 +40,8 @@ dependencies:
   http: ^0.13.4
   intl: ^0.17.0
   freezed_annotation: ^2.0.3
+  firebase_core: ^1.17.1
+  cloud_firestore: ^3.1.17
 
 dev_dependencies:
   flutter_test:

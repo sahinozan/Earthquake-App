@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:earthquake_app/earthquake.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +9,7 @@ import 'package:intl/intl.dart';
 
 Future<Earthquake> fetchEarthquake() async {
   final response = await http.get(Uri.parse(
-      'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=100'));
+      'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=10'));
 
   if (response.statusCode == 200) {
     return Earthquake.fromJson(json.decode(response.body));
@@ -69,9 +70,68 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
           ),
         ),
         actions: [
+          PopupMenuButton(
+            icon: const Icon(Icons.more_vert),
+            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+              const PopupMenuItem(
+                child: ListTile(
+                  leading: Icon(Icons.add),
+                  title: Text('Item 1'),
+                ),
+              ),
+              const PopupMenuItem(
+                child: ListTile(
+                  leading: Icon(Icons.anchor),
+                  title: Text('Item 2'),
+                ),
+              ),
+              const PopupMenuItem(
+                child: ListTile(
+                  leading: Icon(Icons.article),
+                  title: Text('Item 3'),
+                ),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.filter_list),
-            onPressed: () {},
+            onPressed: () {
+              bool ascending = true;
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return Wrap(
+                    children: [
+                      ListTile(
+                        title: const Text('Sort by Magnitude'),
+                        trailing: ascending == true
+                            ? const Icon(Icons.arrow_upward)
+                            : const Icon(
+                                Icons.arrow_downward,
+                              ),
+                        onTap: () {
+                          setState(() {
+                            ascending = !ascending;
+                          });
+                        },
+                      ),
+                      ListTile(
+                        title: const Text('Sort by Date'),
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        title: const Text('Sort by Location'),
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
@@ -83,6 +143,28 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
               return ListView.separated(
                 itemBuilder: (BuildContext context, int index) {
                   earthquakeList.add(snapshot.data!);
+                  Map<String, dynamic> firebaseData = {
+                    'coordinates':
+                        snapshot.data!.features[index].geometry.coordinates,
+                    'id': snapshot.data!.features[index].id,
+                    'mag': snapshot.data!.features[index].properties.mag,
+                    'place': snapshot.data!.features[index].properties.place
+                              .contains(' of ')
+                          ? snapshot.data!.features[index].properties.place
+                              .split(' of ')[1]
+                          : snapshot.data!.features[index].properties.place,
+                    'time': DateFormat.yMMMd().add_jms().format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                            snapshot.data!.features[index].properties.time,
+                          ),
+                        ),
+                  };
+                  /*
+                  FirebaseFirestore.instance
+                      .collection('earthquakes')
+                      .add(firebaseData);
+                  */
+                  FirebaseFirestore.instance.collection('earthquakes').doc(firebaseData['id']).set(firebaseData);
                   return ListTile(
                     title: Text(
                       snapshot.data!.features[index].properties.place
@@ -94,7 +176,8 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                     subtitle: Text(
                       DateFormat.yMMMd().add_jms().format(
                             DateTime.fromMillisecondsSinceEpoch(
-                                snapshot.data!.features[index].properties.time),
+                              snapshot.data!.features[index].properties.time,
+                            ),
                           ),
                     ),
                     trailing: DecoratedBox(
@@ -121,6 +204,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                   );
                 },
                 itemCount: snapshot.data!.features.length,
+                // itemCount: 100,
                 separatorBuilder: (BuildContext context, int index) {
                   return const Divider();
                 },
