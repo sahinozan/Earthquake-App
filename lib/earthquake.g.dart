@@ -37,7 +37,7 @@ Map<String, dynamic> _$$_FeatureToJson(_$_Feature instance) =>
 _$_Properties _$$_PropertiesFromJson(Map<String, dynamic> json) =>
     _$_Properties(
       mag: (json['mag'] as num).toDouble(),
-      place: json['place'] as String,
+      place: json['place'] as String?,
       time: json['time'] as int,
     );
 

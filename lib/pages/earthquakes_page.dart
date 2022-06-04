@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 
 Future<Earthquake> fetchEarthquake() async {
   final response = await http.get(Uri.parse(
-      'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=10'));
+      'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=200'));
 
   if (response.statusCode == 200) {
     return Earthquake.fromJson(json.decode(response.body));
@@ -144,34 +144,27 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                 itemBuilder: (BuildContext context, int index) {
                   earthquakeList.add(snapshot.data!);
                   Map<String, dynamic> firebaseData = {
-                    'coordinates':
-                        snapshot.data!.features[index].geometry.coordinates,
-                    'id': snapshot.data!.features[index].id,
-                    'mag': snapshot.data!.features[index].properties.mag,
-                    'place': snapshot.data!.features[index].properties.place
-                              .contains(' of ')
-                          ? snapshot.data!.features[index].properties.place
-                              .split(' of ')[1]
-                          : snapshot.data!.features[index].properties.place,
+                    'coordinates': [
+                      snapshot.data?.features[index].geometry.coordinates[0],
+                      snapshot.data?.features[index].geometry.coordinates[1],
+                    ],
+                    'id': snapshot.data?.features[index].id,
+                    'mag': snapshot.data?.features[index].properties.mag,
+                    'place': snapshot.data?.features[index].properties.place,
                     'time': DateFormat.yMMMd().add_jms().format(
                           DateTime.fromMillisecondsSinceEpoch(
                             snapshot.data!.features[index].properties.time,
                           ),
                         ),
                   };
-                  /*
                   FirebaseFirestore.instance
                       .collection('earthquakes')
-                      .add(firebaseData);
-                  */
-                  FirebaseFirestore.instance.collection('earthquakes').doc(firebaseData['id']).set(firebaseData);
+                      .doc(firebaseData['id'])
+                      .set(firebaseData);
                   return ListTile(
                     title: Text(
                       snapshot.data!.features[index].properties.place
-                              .contains(' of ')
-                          ? snapshot.data!.features[index].properties.place
-                              .split(' of ')[1]
-                          : snapshot.data!.features[index].properties.place,
+                          .toString(),
                     ),
                     subtitle: Text(
                       DateFormat.yMMMd().add_jms().format(

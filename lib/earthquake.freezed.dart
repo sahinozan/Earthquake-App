@@ -383,7 +383,7 @@ Properties _$PropertiesFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Properties {
   double get mag => throw _privateConstructorUsedError;
-  String get place => throw _privateConstructorUsedError;
+  String? get place => throw _privateConstructorUsedError;
   int get time => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -397,7 +397,7 @@ abstract class $PropertiesCopyWith<$Res> {
   factory $PropertiesCopyWith(
           Properties value, $Res Function(Properties) then) =
       _$PropertiesCopyWithImpl<$Res>;
-  $Res call({double mag, String place, int time});
+  $Res call({double mag, String? place, int time});
 }
 
 /// @nodoc
@@ -422,7 +422,7 @@ class _$PropertiesCopyWithImpl<$Res> implements $PropertiesCopyWith<$Res> {
       place: place == freezed
           ? _value.place
           : place // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       time: time == freezed
           ? _value.time
           : time // ignore: cast_nullable_to_non_nullable
@@ -438,7 +438,7 @@ abstract class _$$_PropertiesCopyWith<$Res>
           _$_Properties value, $Res Function(_$_Properties) then) =
       __$$_PropertiesCopyWithImpl<$Res>;
   @override
-  $Res call({double mag, String place, int time});
+  $Res call({double mag, String? place, int time});
 }
 
 /// @nodoc
@@ -465,7 +465,7 @@ class __$$_PropertiesCopyWithImpl<$Res> extends _$PropertiesCopyWithImpl<$Res>
       place: place == freezed
           ? _value.place
           : place // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       time: time == freezed
           ? _value.time
           : time // ignore: cast_nullable_to_non_nullable
@@ -486,7 +486,7 @@ class _$_Properties with DiagnosticableTreeMixin implements _Properties {
   @override
   final double mag;
   @override
-  final String place;
+  final String? place;
   @override
   final int time;
 
@@ -537,7 +537,7 @@ class _$_Properties with DiagnosticableTreeMixin implements _Properties {
 abstract class _Properties implements Properties {
   const factory _Properties(
       {required final double mag,
-      required final String place,
+      required final String? place,
       required final int time}) = _$_Properties;
 
   factory _Properties.fromJson(Map<String, dynamic> json) =
@@ -546,7 +546,7 @@ abstract class _Properties implements Properties {
   @override
   double get mag => throw _privateConstructorUsedError;
   @override
-  String get place => throw _privateConstructorUsedError;
+  String? get place => throw _privateConstructorUsedError;
   @override
   int get time => throw _privateConstructorUsedError;
   @override
