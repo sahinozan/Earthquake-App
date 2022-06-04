@@ -10,10 +10,10 @@
 .svn/
 migrate_working_dir/
 .ipynb_checkpoints
-linux/
-windows/
-macos/
-web/
+linux
+windows
+macos
+web
 
 # IntelliJ related
 *.iml
