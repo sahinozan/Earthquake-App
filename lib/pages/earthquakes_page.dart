@@ -2,10 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:earthquake_app/earthquake.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import 'package:intl/intl.dart';
+
+Set<Marker> allMarkers = {};
 
 Future<Earthquake> fetchEarthquake() async {
   final response = await http.get(Uri.parse(
@@ -140,67 +143,104 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
           future: futureEarthquake,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return ListView.separated(
+              return ListView.builder(
                 itemBuilder: (BuildContext context, int index) {
-                  earthquakeList.add(snapshot.data!);
-                  Map<String, dynamic> firebaseData = {
-                    'coordinates': [
-                      snapshot.data?.features[index].geometry.coordinates[0],
-                      snapshot.data?.features[index].geometry.coordinates[1],
-                    ],
-                    'id': snapshot.data?.features[index].id,
-                    'mag': snapshot.data?.features[index].properties.mag,
-                    'place': snapshot.data?.features[index].properties.place,
-                    'time': DateFormat.yMMMd().add_jms().format(
-                          DateTime.fromMillisecondsSinceEpoch(
-                            snapshot.data!.features[index].properties.time,
+                  var shortPlace = 'Unknown';
+                  if (snapshot.data!.features[index].properties.place != null &&
+                      !snapshot.data!.features[index].properties.place!
+                          .contains('?')) {
+                    shortPlace = snapshot.data!.features[index].properties.place
+                        .toString();
+
+                    if (shortPlace.contains(' of ')) {
+                      shortPlace = shortPlace.split(' of ')[1];
+                    }
+                    shortPlace =
+                        shortPlace[0].toUpperCase() + shortPlace.substring(1);
+
+                    FirebaseFirestore.instance
+                        .collection('earthquakes')
+                        .get()
+                        .then(
+                          (res) => res.docs.forEach(
+                            (doc) {
+                              allMarkers.add(
+                                Marker(
+                                  markerId: MarkerId(doc.get('id')),
+                                  position: LatLng(doc.get('coordinates')[0],
+                                      doc.get('coordinates')[1]),
+                                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                                    doc.get('mag') > 5.5
+                                        ? BitmapDescriptor.hueRed
+                                        : doc.get('mag') > 4.5
+                                            ? BitmapDescriptor.hueOrange
+                                            : BitmapDescriptor.hueYellow,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        ),
-                  };
-                  FirebaseFirestore.instance
-                      .collection('earthquakes')
-                      .doc(firebaseData['id'])
-                      .set(firebaseData);
-                  return ListTile(
-                    title: Text(
-                      snapshot.data!.features[index].properties.place
-                          .toString(),
-                    ),
-                    subtitle: Text(
-                      DateFormat.yMMMd().add_jms().format(
+                        );
+
+                    earthquakeList.add(snapshot.data!);
+                    Map<String, dynamic> firebaseData = {
+                      'coordinates': [
+                        snapshot.data?.features[index].geometry.coordinates[0],
+                        snapshot.data?.features[index].geometry.coordinates[1],
+                      ],
+                      'id': snapshot.data?.features[index].id,
+                      'mag': snapshot.data?.features[index].properties.mag,
+                      'place': shortPlace,
+                      'time': DateFormat.yMMMd().add_jms().format(
                             DateTime.fromMillisecondsSinceEpoch(
                               snapshot.data!.features[index].properties.time,
                             ),
                           ),
-                    ),
-                    trailing: DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: magnitudeColors(
-                            snapshot.data!.features[index].properties.mag),
-                      ),
-                      child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: Center(
-                          child: Text(
-                            snapshot.data!.features[index].properties.mag
-                                .toString(),
-                            style: const TextStyle(
-                              fontSize: 20,
-                              color: Colors.black,
+                    };
+                    FirebaseFirestore.instance
+                        .collection('earthquakes')
+                        .doc(firebaseData['id'])
+                        .set(firebaseData);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5.0),
+                      child: ListTile(
+                        title: Text(shortPlace.toString()),
+                        subtitle: Text(
+                          DateFormat.yMMMd().add_jms().format(
+                                DateTime.fromMillisecondsSinceEpoch(
+                                  snapshot
+                                      .data!.features[index].properties.time,
+                                ),
+                              ),
+                        ),
+                        trailing: DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: magnitudeColors(
+                                snapshot.data!.features[index].properties.mag),
+                          ),
+                          child: SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: Center(
+                              child: Text(
+                                snapshot.data!.features[index].properties.mag
+                                    .toString(),
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  );
+                    );
+                  }
+                  return Container();
                 },
                 itemCount: snapshot.data!.features.length,
                 // itemCount: 100,
-                separatorBuilder: (BuildContext context, int index) {
-                  return const Divider();
-                },
               );
             } else if (snapshot.hasError) {
               return Text("${snapshot.error}");

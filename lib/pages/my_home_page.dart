@@ -20,8 +20,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final screens = [
-      const GoogleMapPage(),
       const EarthquakesPage(),
+      const GoogleMapPage(),
       const SettingsPage(),
     ];
     return Scaffold(
@@ -39,12 +39,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Map',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.list),
             label: 'List',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Map',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
