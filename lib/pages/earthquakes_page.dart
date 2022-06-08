@@ -158,6 +158,8 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                     shortPlace =
                         shortPlace[0].toUpperCase() + shortPlace.substring(1);
 
+                    allMarkers.clear();
+
                     FirebaseFirestore.instance
                         .collection('earthquakes')
                         .get()
@@ -201,6 +203,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                         .collection('earthquakes')
                         .doc(firebaseData['id'])
                         .set(firebaseData);
+                        
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
                       child: ListTile(

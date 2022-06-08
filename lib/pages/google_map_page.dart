@@ -54,35 +54,4 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
       markers: allMarkers,
     );
   }
-
-  StreamBuilder<Object?> createGoogleMaps1() {
-    return StreamBuilder(builder: (context, snapshot) {
-      return GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: center,
-          zoom: 1.0,
-        ),
-        markers: allMarkers,
-      );
-    });
-  }
-
-  FutureBuilder<Object?> createGoogleMaps2() {
-    return FutureBuilder(builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      }
-      return GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: center,
-          zoom: 1.0,
-        ),
-        markers: allMarkers,
-      );
-    });
-  }
 }
