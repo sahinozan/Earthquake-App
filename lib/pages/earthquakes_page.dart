@@ -26,12 +26,12 @@ Map<bool, Icon> dateIcons = {
 final magIconProvider = StateProvider<bool>((ref) => true);
 final dateIconProvider = StateProvider<bool>((ref) => true);
 
-const defaultUrl =
-    'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=200';
-
 var earthquakeList = <Earthquake>[];
 
-Future<Earthquake> fetchEarthquake({url = defaultUrl}) async {
+Future<Earthquake> fetchEarthquake() async {
+  var url =
+      'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=200';
+
   if (filter == 'Date') {
     if (timeAscending) {
       url =
@@ -186,11 +186,13 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                                   position: LatLng(doc.get('coordinates')[1],
                                       doc.get('coordinates')[0]),
                                   icon: BitmapDescriptor.defaultMarkerWithHue(
-                                    doc.get('mag') > 5.5
+                                    doc.get('mag') > 6
                                         ? BitmapDescriptor.hueRed
-                                        : doc.get('mag') > 4.5
+                                        : doc.get('mag') > 5
                                             ? BitmapDescriptor.hueOrange
-                                            : BitmapDescriptor.hueYellow,
+                                            : doc.get('mag') > 4
+                                                ? BitmapDescriptor.hueYellow
+                                                : BitmapDescriptor.hueGreen,
                                   ),
                                   infoWindow: InfoWindow(
                                     title: doc.get('place'),
