@@ -18,7 +18,7 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
 
   Future _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
-    mapController.animateCamera(
+    await mapController.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
           target: center,

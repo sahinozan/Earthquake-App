@@ -95,6 +95,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
       (ref) => Theme.of(context).brightness == Brightness.dark,
     );
     final isDarkMode = ref.watch(darkModeProvider);
+    futureEarthquake = fetchEarthquake();
 
     return Scaffold(
       appBar: AppBar(
@@ -153,8 +154,8 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
         ],
       ),
       body: Center(
-        child: FutureBuilder<Earthquake>(
-          future: futureEarthquake,
+        child: StreamBuilder<Earthquake>(
+          stream: futureEarthquake.asStream(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
