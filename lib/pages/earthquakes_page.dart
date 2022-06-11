@@ -9,10 +9,49 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 
 Set<Marker> allMarkers = {};
+String filter = 'Date';
+bool magAscending = false;
+bool timeAscending = false;
 
-Future<Earthquake> fetchEarthquake() async {
-  final response = await http.get(Uri.parse(
-      'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=200'));
+Map<bool, Icon> magIcons = {
+  true: const Icon(Icons.arrow_drop_down, size: 40),
+  false: const Icon(Icons.arrow_drop_up, size: 40),
+};
+
+Map<bool, Icon> dateIcons = {
+  true: const Icon(Icons.arrow_drop_down, size: 40),
+  false: const Icon(Icons.arrow_drop_up, size: 40),
+};
+
+final magIconProvider = StateProvider<bool>((ref) => true);
+final dateIconProvider = StateProvider<bool>((ref) => true);
+
+const defaultUrl =
+    'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=200';
+
+var earthquakeList = <Earthquake>[];
+
+Future<Earthquake> fetchEarthquake({url = defaultUrl}) async {
+  if (filter == 'Date') {
+    if (timeAscending) {
+      url =
+          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time-asc&minmag=4&limit=200';
+    } else {
+      url =
+          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=200';
+    }
+  }
+  if (filter == 'Magnitude') {
+    if (!magAscending) {
+      url =
+          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=magnitude&minmag=4&limit=200';
+    } else {
+      url =
+          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=magnitude-asc&minmag=4&limit=200';
+    }
+  }
+
+  final response = await http.get(Uri.parse(url));
 
   if (response.statusCode == 200) {
     return Earthquake.fromJson(json.decode(response.body));
@@ -20,8 +59,6 @@ Future<Earthquake> fetchEarthquake() async {
     throw Exception('Failed to load earthquake data');
   }
 }
-
-var earthquakeList = <Earthquake>[];
 
 class EarthquakesPage extends ConsumerStatefulWidget {
   const EarthquakesPage({Key? key}) : super(key: key);
@@ -73,33 +110,9 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
           ),
         ),
         actions: [
-          PopupMenuButton(
-            icon: const Icon(Icons.more_vert),
-            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-              const PopupMenuItem(
-                child: ListTile(
-                  leading: Icon(Icons.add),
-                  title: Text('Item 1'),
-                ),
-              ),
-              const PopupMenuItem(
-                child: ListTile(
-                  leading: Icon(Icons.anchor),
-                  title: Text('Item 2'),
-                ),
-              ),
-              const PopupMenuItem(
-                child: ListTile(
-                  leading: Icon(Icons.article),
-                  title: Text('Item 3'),
-                ),
-              ),
-            ],
-          ),
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: () {
-              bool ascending = true;
               showModalBottomSheet(
                 context: context,
                 builder: (context) {
@@ -107,26 +120,27 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                     children: [
                       ListTile(
                         title: const Text('Sort by Magnitude'),
-                        trailing: ascending == true
-                            ? const Icon(Icons.arrow_upward)
-                            : const Icon(
-                                Icons.arrow_downward,
-                              ),
+                        trailing: magIcons[ref.watch(magIconProvider)],
                         onTap: () {
                           setState(() {
-                            ascending = !ascending;
+                            filter = 'Magnitude';
+                            magAscending = !magAscending;
+                            ref.watch(magIconProvider.notifier).state =
+                                !ref.watch(magIconProvider.notifier).state;
                           });
-                        },
-                      ),
-                      ListTile(
-                        title: const Text('Sort by Date'),
-                        onTap: () {
                           Navigator.pop(context);
                         },
                       ),
                       ListTile(
-                        title: const Text('Sort by Location'),
+                        title: const Text('Sort by Date'),
+                        trailing: dateIcons[ref.watch(dateIconProvider)],
                         onTap: () {
+                          setState(() {
+                            filter = 'Date';
+                            timeAscending = !timeAscending;
+                            ref.watch(dateIconProvider.notifier).state =
+                                !ref.watch(dateIconProvider.notifier).state;
+                          });
                           Navigator.pop(context);
                         },
                       ),
@@ -169,14 +183,18 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                               allMarkers.add(
                                 Marker(
                                   markerId: MarkerId(doc.get('id')),
-                                  position: LatLng(doc.get('coordinates')[0],
-                                      doc.get('coordinates')[1]),
+                                  position: LatLng(doc.get('coordinates')[1],
+                                      doc.get('coordinates')[0]),
                                   icon: BitmapDescriptor.defaultMarkerWithHue(
                                     doc.get('mag') > 5.5
                                         ? BitmapDescriptor.hueRed
                                         : doc.get('mag') > 4.5
                                             ? BitmapDescriptor.hueOrange
                                             : BitmapDescriptor.hueYellow,
+                                  ),
+                                  infoWindow: InfoWindow(
+                                    title: doc.get('place'),
+                                    snippet: doc.get('mag').toString(),
                                   ),
                                 ),
                               );
@@ -203,7 +221,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                         .collection('earthquakes')
                         .doc(firebaseData['id'])
                         .set(firebaseData);
-                        
+
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
                       child: ListTile(
