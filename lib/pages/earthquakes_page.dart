@@ -197,7 +197,8 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                                   ),
                                   infoWindow: InfoWindow(
                                     title: doc.get('place'),
-                                    snippet: doc.get('mag').toString(),
+                                    snippet:
+                                        '${doc.get('mag').toString()}  -  ${doc.get('time')}', 
                                   ),
                                 ),
                               );
@@ -205,7 +206,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                           ),
                         );
 
-                    earthquakeList.add(snapshot.data!);
+                    // earthquakeList.add(snapshot.data!);
                     Map<String, dynamic> firebaseData = {
                       'coordinates': [
                         snapshot.data?.features[index].geometry.coordinates[0],
@@ -228,28 +229,21 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
                       child: ListTile(
-                        title: Text(shortPlace.toString()),
+                        title: Text(firebaseData['place']),
                         subtitle: Text(
-                          DateFormat.yMMMd().add_jms().format(
-                                DateTime.fromMillisecondsSinceEpoch(
-                                  snapshot
-                                      .data!.features[index].properties.time,
-                                ),
-                              ),
+                          firebaseData['time'].toString(),
                         ),
                         trailing: DecoratedBox(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            color: magnitudeColors(
-                                snapshot.data!.features[index].properties.mag),
+                            color: magnitudeColors(firebaseData['mag']),
                           ),
                           child: SizedBox(
                             width: 50,
                             height: 50,
                             child: Center(
                               child: Text(
-                                snapshot.data!.features[index].properties.mag
-                                    .toString(),
+                                firebaseData['mag'].toString(),
                                 style: const TextStyle(
                                   fontSize: 20,
                                   color: Colors.black,
