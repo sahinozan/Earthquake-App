@@ -3,6 +3,7 @@ import 'package:earthquake_app/pages/language_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final languageProvider = StateProvider((ref) => 'English');
 final indexProvider = StateProvider((ref) => 0);
@@ -80,6 +81,28 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ref.read(measurementProvider.notifier).state = value,
                 title: const Text('Measurement System'),
                 leading: const Icon(Icons.architecture),
+              ),
+              SettingsTile.navigation(
+                title: const Text('Source'),
+                description: const Text('US Geological Survey (USGS)'),
+                leading: const Icon(Icons.source),
+                // trailing: const Icon(Icons.open_in_new),
+                trailing: IconButton(
+                  icon: const Icon(Icons.open_in_new),
+                  onPressed: () async {
+                    var url = Uri.parse('https://earthquake.usgs.gov/');
+                    if (!await canLaunchUrl(url)) {
+                      await launchUrl(url);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                ),
+              ),
+              SettingsTile(
+                title: const Text('Version'),
+                description: const Text('1.0.0'),
+                leading: const Icon(Icons.info),
               ),
             ],
           ),
