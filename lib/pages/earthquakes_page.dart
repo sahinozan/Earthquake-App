@@ -173,6 +173,25 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                     shortPlace =
                         shortPlace[0].toUpperCase() + shortPlace.substring(1);
 
+                    Map<String, dynamic> firebaseData = {
+                      'coordinates': [
+                        snapshot.data?.features[index].geometry.coordinates[0],
+                        snapshot.data?.features[index].geometry.coordinates[1],
+                      ],
+                      'id': snapshot.data?.features[index].id,
+                      'mag': snapshot.data?.features[index].properties.mag,
+                      'place': shortPlace,
+                      'time': DateFormat.yMMMd().add_jms().format(
+                            DateTime.fromMillisecondsSinceEpoch(
+                              snapshot.data!.features[index].properties.time,
+                            ),
+                          ),
+                    };
+                    FirebaseFirestore.instance
+                        .collection('earthquakes')
+                        .doc(firebaseData['id'])
+                        .set(firebaseData);
+
                     allMarkers.clear();
 
                     FirebaseFirestore.instance
@@ -198,7 +217,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                                   infoWindow: InfoWindow(
                                     title: doc.get('place'),
                                     snippet:
-                                        '${doc.get('mag').toString()}  -  ${doc.get('time')}', 
+                                        '${doc.get('mag').toString()}  -  ${doc.get('time')}',
                                   ),
                                 ),
                               );
@@ -207,25 +226,6 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                         );
 
                     // earthquakeList.add(snapshot.data!);
-                    Map<String, dynamic> firebaseData = {
-                      'coordinates': [
-                        snapshot.data?.features[index].geometry.coordinates[0],
-                        snapshot.data?.features[index].geometry.coordinates[1],
-                      ],
-                      'id': snapshot.data?.features[index].id,
-                      'mag': snapshot.data?.features[index].properties.mag,
-                      'place': shortPlace,
-                      'time': DateFormat.yMMMd().add_jms().format(
-                            DateTime.fromMillisecondsSinceEpoch(
-                              snapshot.data!.features[index].properties.time,
-                            ),
-                          ),
-                    };
-                    FirebaseFirestore.instance
-                        .collection('earthquakes')
-                        .doc(firebaseData['id'])
-                        .set(firebaseData);
-
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
                       child: ListTile(

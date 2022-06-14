@@ -15,27 +15,30 @@ class GoogleMapPage extends ConsumerStatefulWidget {
 class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
   late GoogleMapController mapController;
   LatLng center = const LatLng(39.590176, -31.786420);
+  Set<Marker> _markers = {};
 
-  Future _onMapCreated(GoogleMapController controller) async {
+  Future _onMapCreated(
+      GoogleMapController controller) async {
+    setState(() {
+      _markers = allMarkers;
+    });
     mapController = controller;
+
+    /*
     await mapController.animateCamera(
       CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: center,
+        const CameraPosition(
+          target: LatLng(19.590176, -70.786420),
           zoom: 1.0,
         ),
       ),
     );
-    return const CircularProgressIndicator();
-  }
-
-  void createAllMarkers() async {
-    setState(() {});
+    */
+    // return const CircularProgressIndicator();
   }
 
   @override
   void initState() {
-    createAllMarkers();
     super.initState();
   }
 
@@ -51,7 +54,7 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
         target: center,
         zoom: 1.0,
       ),
-      markers: allMarkers,
+      markers: _markers,
     );
   }
 }
