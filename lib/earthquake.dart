@@ -75,6 +75,7 @@ class Geometry with _$Geometry {
       coordinates: [
         snapshot.data()['coordinates'][0],
         snapshot.data()['coordinates'][1],
+        snapshot.data()['coordinates'][2],
       ],
     );
   }

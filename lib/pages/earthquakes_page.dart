@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:earthquake_app/earthquake.dart';
+import 'package:earthquake_app/pages/my_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -186,6 +187,8 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                               snapshot.data!.features[index].properties.time,
                             ),
                           ),
+                      'depth': snapshot
+                          .data!.features[index].geometry.coordinates[2],
                     };
                     FirebaseFirestore.instance
                         .collection('earthquakes')
@@ -224,8 +227,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                             },
                           ),
                         );
-
-                    // earthquakeList.add(snapshot.data!);
+                    // earthquakeList.add(snapshot.data!)
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
                       child: ListTile(
@@ -233,25 +235,57 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                         subtitle: Text(
                           firebaseData['time'].toString(),
                         ),
-                        trailing: DecoratedBox(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: magnitudeColors(firebaseData['mag']),
-                          ),
-                          child: SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: Center(
-                              child: Text(
-                                firebaseData['mag'].toString(),
+                        trailing: SizedBox(
+                          width: 100,
+                          height: 60,
+                          child: Row(
+                            children: [
+                              Text(
+                                '${firebaseData['depth'].toString()} km',
                                 style: const TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 10,
                                   color: Colors.black,
                                 ),
                               ),
-                            ),
+                              Positioned(
+                                right: 30,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: magnitudeColors(firebaseData['mag']),
+                                  ),
+                                  child: SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: Center(
+                                      child: Text(
+                                        firebaseData['mag'].toString(),
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                        onTap: () {
+                          ref.read(selectedMarkerProvider.notifier).state =
+                              LatLng(
+                            snapshot
+                                .data!.features[index].geometry.coordinates[1],
+                            snapshot
+                                .data!.features[index].geometry.coordinates[0],
+                          );
+                          ref
+                              .watch(
+                                bottomNavigationBarProvider.notifier,
+                              )
+                              .state = 1;
+                        },
                       ),
                     );
                   }

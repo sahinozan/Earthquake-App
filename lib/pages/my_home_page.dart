@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:earthquake_app/pages/google_map_page.dart';
 import 'package:animations/animations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 final bottomNavigationBarProvider = StateProvider((ref) => 0);
+final selectedMarkerProvider =
+    StateProvider((ref) => const LatLng(39.590176, -31.786420));
 
 class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({
