@@ -45,7 +45,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         sections: [
           SettingsSection(
             tiles: [
-              SettingsTile.navigation(
+              /* SettingsTile.navigation(
                 title: const Text('Language'),
                 value: Text(selectedLanguage),
                 leading: const Icon(Icons.language),
@@ -57,7 +57,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ),
                   );
                 },
-              ),
+              ), */
               SettingsTile.switchTile(
                 initialValue: ref.watch(darkModeProvider),
                 onToggle: (value) {
