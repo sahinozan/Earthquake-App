@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 final bottomNavigationBarProvider = StateProvider((ref) => 0);
 final selectedMarkerProvider =
     StateProvider((ref) => const LatLng(39.590176, -31.786420));
+final selectedMarkerIdProvider = StateProvider((ref) => const MarkerId('0'));
 
 class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({

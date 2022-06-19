@@ -10,6 +10,7 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 
 Set<Marker> allMarkers = {};
+Map<DateTime, Marker> allMarkersMap = {};
 String filter = 'Date';
 bool magAscending = false;
 bool timeAscending = false;
@@ -26,7 +27,6 @@ Map<bool, Icon> dateIcons = {
 
 final magIconProvider = StateProvider<bool>((ref) => true);
 final dateIconProvider = StateProvider<bool>((ref) => true);
-
 var earthquakeList = <Earthquake>[];
 
 Future<Earthquake> fetchEarthquake() async {
@@ -159,52 +159,93 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
           stream: futureEarthquake.asStream(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return ListView.builder(
-                itemBuilder: (BuildContext context, int index) {
-                  var shortPlace = 'Unknown';
-                  if (snapshot.data!.features[index].properties.place != null &&
-                      !snapshot.data!.features[index].properties.place!
-                          .contains('?')) {
-                    shortPlace = snapshot.data!.features[index].properties.place
-                        .toString();
+              return RefreshIndicator(
+                onRefresh: () async {
+                  await futureEarthquake;
+                  setState(() {});
+                },
+                child: ListView.builder(
+                  itemBuilder: (BuildContext context, int index) {
+                    var shortPlace = 'Unknown';
+                    if (snapshot.data!.features[index].properties.place !=
+                            null &&
+                        !snapshot.data!.features[index].properties.place!
+                            .contains('?')) {
+                      shortPlace = snapshot
+                          .data!.features[index].properties.place
+                          .toString();
 
-                    if (shortPlace.contains(' of ')) {
-                      shortPlace = shortPlace.split(' of ')[1];
-                    }
-                    shortPlace =
-                        shortPlace[0].toUpperCase() + shortPlace.substring(1);
+                      if (shortPlace.contains(' of ')) {
+                        shortPlace = shortPlace.split(' of ')[1];
+                      }
+                      shortPlace =
+                          shortPlace[0].toUpperCase() + shortPlace.substring(1);
 
-                    Map<String, dynamic> firebaseData = {
-                      'coordinates': [
-                        snapshot.data?.features[index].geometry.coordinates[0],
-                        snapshot.data?.features[index].geometry.coordinates[1],
-                      ],
-                      'id': snapshot.data?.features[index].id,
-                      'mag': snapshot.data?.features[index].properties.mag,
-                      'place': shortPlace,
-                      'time': DateFormat.yMMMd().add_jms().format(
-                            DateTime.fromMillisecondsSinceEpoch(
-                              snapshot.data!.features[index].properties.time,
+                      Map<String, dynamic> firebaseData = {
+                        'coordinates': [
+                          snapshot
+                              .data?.features[index].geometry.coordinates[0],
+                          snapshot
+                              .data?.features[index].geometry.coordinates[1],
+                        ],
+                        'id': snapshot.data?.features[index].id,
+                        'mag': snapshot.data?.features[index].properties.mag,
+                        'place': shortPlace,
+                        'time': DateFormat.yMMMd().add_jms().format(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                snapshot.data!.features[index].properties.time,
+                              ),
                             ),
-                          ),
-                      'depth': snapshot
-                          .data!.features[index].geometry.coordinates[2],
-                    };
-                    FirebaseFirestore.instance
-                        .collection('earthquakes')
-                        .doc(firebaseData['id'])
-                        .set(firebaseData);
+                        'depth': snapshot
+                            .data!.features[index].geometry.coordinates[2],
+                      };
+                      FirebaseFirestore.instance
+                          .collection('earthquakes')
+                          .doc(firebaseData['id'])
+                          .set(firebaseData);
 
-                    allMarkers.clear();
+                      allMarkers.clear();
+                      allMarkersMap.clear();
 
-                    FirebaseFirestore.instance
-                        .collection('earthquakes')
-                        .get()
-                        .then(
-                          (res) => res.docs.forEach(
-                            (doc) {
-                              allMarkers.add(
-                                Marker(
+                      /* FirebaseFirestore.instance
+                          .collection('earthquakes')
+                          .get()
+                          .then(
+                            (res) => res.docs.forEach(
+                              (doc) {
+                                allMarkers.add(
+                                  Marker(
+                                    markerId: MarkerId(doc.get('id')),
+                                    position: LatLng(doc.get('coordinates')[1],
+                                        doc.get('coordinates')[0]),
+                                    icon: BitmapDescriptor.defaultMarkerWithHue(
+                                      doc.get('mag') > 6
+                                          ? BitmapDescriptor.hueRed
+                                          : doc.get('mag') > 5
+                                              ? BitmapDescriptor.hueOrange
+                                              : doc.get('mag') > 4
+                                                  ? BitmapDescriptor.hueYellow
+                                                  : BitmapDescriptor.hueGreen,
+                                    ),
+                                    infoWindow: InfoWindow(
+                                      title: doc.get('place'),
+                                      snippet:
+                                          '${doc.get('mag').toString()}  -  ${doc.get('time')}',
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ); */
+
+                      FirebaseFirestore.instance
+                          .collection('earthquakes')
+                          .get()
+                          .then(
+                            (res) => res.docs.forEach(
+                              (doc) {
+                                allMarkersMap[DateFormat('yyyy-MM-dd HH:mm:ss')
+                                    .parse(snapshot.data!.features[index].properties.time.toString(), true)] = Marker(
                                   markerId: MarkerId(doc.get('id')),
                                   position: LatLng(doc.get('coordinates')[1],
                                       doc.get('coordinates')[0]),
@@ -222,77 +263,67 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                                     snippet:
                                         '${doc.get('mag').toString()}  -  ${doc.get('time')}',
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
+                          );
+                      for (var i in allMarkersMap.values) {
+                        print(i);
+                      }
+                      // allMarkers.addAll(allMarkersMap.values);
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5.0),
+                        child: ListTile(
+                          title: Text(firebaseData['place']),
+                          subtitle: Text(
+                            firebaseData['time'].toString(),
                           ),
-                        );
-                    // earthquakeList.add(snapshot.data!)
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5.0),
-                      child: ListTile(
-                        title: Text(firebaseData['place']),
-                        subtitle: Text(
-                          firebaseData['time'].toString(),
-                        ),
-                        trailing: SizedBox(
-                          width: 100,
-                          height: 60,
-                          child: Row(
-                            children: [
-                              Text(
-                                '${firebaseData['depth'].toString()} km',
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.black,
-                                ),
+                          trailing: SizedBox(
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: magnitudeColors(firebaseData['mag']),
                               ),
-                              Positioned(
-                                right: 30,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: magnitudeColors(firebaseData['mag']),
-                                  ),
-                                  child: SizedBox(
-                                    width: 50,
-                                    height: 50,
-                                    child: Center(
-                                      child: Text(
-                                        firebaseData['mag'].toString(),
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.black,
-                                        ),
-                                      ),
+                              child: SizedBox(
+                                width: 50,
+                                height: 50,
+                                child: Center(
+                                  child: Text(
+                                    firebaseData['mag'].toString(),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.black,
                                     ),
                                   ),
                                 ),
                               ),
-                            ],
+                            ),
                           ),
+                          onTap: () {
+                            ref.read(selectedMarkerProvider.notifier).state =
+                                LatLng(
+                              snapshot.data!.features[index].geometry
+                                  .coordinates[1],
+                              snapshot.data!.features[index].geometry
+                                  .coordinates[0],
+                            );
+                            ref
+                                .watch(
+                                  bottomNavigationBarProvider.notifier,
+                                )
+                                .state = 1;
+                            ref.read(selectedMarkerIdProvider.notifier).state =
+                                MarkerId(snapshot.data!.features[index].id);
+                          },
                         ),
-                        onTap: () {
-                          ref.read(selectedMarkerProvider.notifier).state =
-                              LatLng(
-                            snapshot
-                                .data!.features[index].geometry.coordinates[1],
-                            snapshot
-                                .data!.features[index].geometry.coordinates[0],
-                          );
-                          ref
-                              .watch(
-                                bottomNavigationBarProvider.notifier,
-                              )
-                              .state = 1;
-                        },
-                      ),
-                    );
-                  }
-                  return Container();
-                },
-                itemCount: snapshot.data!.features.length,
-                // itemCount: 100,
+                      );
+                    }
+                    return Container();
+                  },
+                  itemCount: snapshot.data!.features.length,
+                  // itemCount: 100,
+                ),
               );
             } else if (snapshot.hasError) {
               return Text("${snapshot.error}");
