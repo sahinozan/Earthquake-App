@@ -207,7 +207,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                       allMarkers.clear();
                       allMarkersMap.clear();
 
-                      /* FirebaseFirestore.instance
+                      FirebaseFirestore.instance
                           .collection('earthquakes')
                           .get()
                           .then(
@@ -236,16 +236,20 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                                 );
                               },
                             ),
-                          ); */
+                          );
 
-                      FirebaseFirestore.instance
+                      /* FirebaseFirestore.instance
                           .collection('earthquakes')
                           .get()
                           .then(
                             (res) => res.docs.forEach(
                               (doc) {
                                 allMarkersMap[DateFormat('yyyy-MM-dd HH:mm:ss')
-                                    .parse(snapshot.data!.features[index].properties.time.toString(), true)] = Marker(
+                                    .parse(
+                                        snapshot.data!.features[index]
+                                            .properties.time
+                                            .toString(),
+                                        true)] = Marker(
                                   markerId: MarkerId(doc.get('id')),
                                   position: LatLng(doc.get('coordinates')[1],
                                       doc.get('coordinates')[0]),
@@ -266,10 +270,8 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                                 );
                               },
                             ),
-                          );
-                      for (var i in allMarkersMap.values) {
-                        print(i);
-                      }
+                          ); */
+
                       // allMarkers.addAll(allMarkersMap.values);
 
                       return Padding(

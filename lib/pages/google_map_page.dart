@@ -24,7 +24,7 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
 
   Future _onMapCreated(GoogleMapController controller) async {
     setState(() {
-      _markers = allMarkersMap.values.toSet();
+      _markers = allMarkers;
       // shownMarkers = allMarkers;
       // _allMarkersMap = allMarkersMap;
     });
