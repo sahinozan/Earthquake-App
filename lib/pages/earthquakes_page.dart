@@ -10,7 +10,7 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 
 Set<Marker> allMarkers = {};
-Map<DateTime, Marker> allMarkersMap = {};
+Map<String, Marker> allMarkersMap = {};
 String filter = 'Date';
 bool magAscending = false;
 bool timeAscending = false;
@@ -31,24 +31,24 @@ var earthquakeList = <Earthquake>[];
 
 Future<Earthquake> fetchEarthquake() async {
   var url =
-      'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=200';
+      'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=500';
 
   if (filter == 'Date') {
     if (timeAscending) {
       url =
-          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time-asc&minmag=4&limit=200';
+          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time-asc&minmag=4&limit=500';
     } else {
       url =
-          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=200';
+          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=500';
     }
   }
   if (filter == 'Magnitude') {
     if (!magAscending) {
       url =
-          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=magnitude&minmag=4&limit=200';
+          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=magnitude&minmag=4&limit=500';
     } else {
       url =
-          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=magnitude-asc&minmag=4&limit=200';
+          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=magnitude-asc&minmag=4&limit=500';
     }
   }
 
@@ -191,11 +191,11 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                         'id': snapshot.data?.features[index].id,
                         'mag': snapshot.data?.features[index].properties.mag,
                         'place': shortPlace,
-                        'time': DateFormat.yMMMd().add_jms().format(
-                              DateTime.fromMillisecondsSinceEpoch(
-                                snapshot.data!.features[index].properties.time,
-                              ),
-                            ),
+                        'time': DateFormat("yyyy-MM-dd hh:mm:ss").format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                            snapshot.data!.features[index].properties.time,
+                          ),
+                        ),
                         'depth': snapshot
                             .data!.features[index].geometry.coordinates[2],
                       };
@@ -207,7 +207,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                       allMarkers.clear();
                       allMarkersMap.clear();
 
-                      FirebaseFirestore.instance
+                      /* FirebaseFirestore.instance
                           .collection('earthquakes')
                           .get()
                           .then(
@@ -236,20 +236,15 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                                 );
                               },
                             ),
-                          );
+                          ); */
 
-                      /* FirebaseFirestore.instance
+                      FirebaseFirestore.instance
                           .collection('earthquakes')
                           .get()
                           .then(
                             (res) => res.docs.forEach(
                               (doc) {
-                                allMarkersMap[DateFormat('yyyy-MM-dd HH:mm:ss')
-                                    .parse(
-                                        snapshot.data!.features[index]
-                                            .properties.time
-                                            .toString(),
-                                        true)] = Marker(
+                                allMarkersMap[doc['time']] = Marker(
                                   markerId: MarkerId(doc.get('id')),
                                   position: LatLng(doc.get('coordinates')[1],
                                       doc.get('coordinates')[0]),
@@ -270,7 +265,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                                 );
                               },
                             ),
-                          ); */
+                          );
 
                       // allMarkers.addAll(allMarkersMap.values);
 

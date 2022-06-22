@@ -3,6 +3,7 @@ import 'package:earthquake_app/pages/my_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 
 class GoogleMapPage extends ConsumerStatefulWidget {
   const GoogleMapPage({
@@ -15,18 +16,20 @@ class GoogleMapPage extends ConsumerStatefulWidget {
 
 class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
   late GoogleMapController mapController;
-  Set<Marker> _markers = {};
+  Map<String, Marker> _markersMap = {};
+  Map<String, Marker?> _shownMarkersMap = {};
   double sliderValue = 0.0;
 
   var sliderValueMap = {
-    0.0: 'Today',
+    0.0: 'Last 15 days',
     1.0: 'Last 7 days',
-    2.0: 'Last 30 days',
+    2.0: 'Today',
   };
 
   Future _onMapCreated(GoogleMapController controller) async {
     setState(() {
-      _markers = allMarkers;
+      _markersMap = allMarkersMap;
+      _shownMarkersMap = allMarkersMap;
     });
     mapController = controller;
 
@@ -51,8 +54,6 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
 
   @override
   Widget build(BuildContext context) {
-    // final currentDate = DateFormat.yMMMd().add_jms().format(DateTime.now());
-
     return Stack(
       children: [
         GoogleMap(
@@ -61,7 +62,7 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
             target: LatLng(39.590176, -31.786420),
             zoom: 1.0,
           ),
-          markers: _markers,
+          markers: Set<Marker>.from(_shownMarkersMap.values),
         ),
         Positioned(
           bottom: 30,
@@ -75,9 +76,41 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
             label: sliderValueMap[sliderValue],
             value: sliderValue,
             onChanged: (double value) {
-              if (value == 5) {
-              } else {
-                setState(() {});
+              Map<String, Marker?> tempMarkersMap = {};
+
+              if (value == 0) {
+                for (final m in _markersMap.keys) {
+                  if (DateTime.now().difference(
+                          DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
+                      const Duration(days: 1)) {
+                    tempMarkersMap[m] = _markersMap[m];
+                  }
+                }
+                setState(() {
+                  _shownMarkersMap = _markersMap;
+                });
+              } else if (value == 1) {
+                for (final m in _markersMap.keys) {
+                  if (DateTime.now().difference(
+                              DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
+                          const Duration(days: 15)) {
+                    tempMarkersMap[m] = _markersMap[m];
+                  }
+                }
+                setState(() {
+                  _shownMarkersMap = tempMarkersMap;
+                });
+              } else if (value == 2) {
+                for (final m in _markersMap.keys) {
+                  if (DateTime.now().difference(
+                              DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
+                          const Duration(days: 7)) {
+                    tempMarkersMap[m] = _markersMap[m];
+                  }
+                }
+                setState(() {
+                  _shownMarkersMap = tempMarkersMap;
+                });
               }
               setState(() {
                 sliderValue = value;

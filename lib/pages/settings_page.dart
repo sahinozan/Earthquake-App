@@ -24,7 +24,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       (ref) => Theme.of(context).brightness == Brightness.dark,
     );
     final isDarkMode = ref.watch(darkThemeProvider);
-    final selectedLanguage = ref.watch(languageProvider);
+    // final selectedLanguage = ref.watch(languageProvider);
 
     return Scaffold(
       appBar: AppBar(
