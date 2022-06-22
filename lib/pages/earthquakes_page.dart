@@ -229,7 +229,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                                   infoWindow: InfoWindow(
                                     title: doc.get('place'),
                                     snippet:
-                                        '${doc.get('mag').toString()}  -  ${doc.get('time')}',
+                                        '${doc.get('mag').toString()}  -  ${DateFormat.yMMMd().add_jms().format(DateFormat("yyyy-MM-dd hh:mm:ss").parse(doc.get('time')))}',
                                   ),
                                 );
                               },
