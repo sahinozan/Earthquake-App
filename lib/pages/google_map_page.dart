@@ -3,7 +3,6 @@ import 'package:earthquake_app/pages/my_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
 
 class GoogleMapPage extends ConsumerStatefulWidget {
   const GoogleMapPage({
@@ -17,16 +16,17 @@ class GoogleMapPage extends ConsumerStatefulWidget {
 class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
   late GoogleMapController mapController;
   Set<Marker> _markers = {};
-  // Set<Marker> shownMarkers = {};
-  // Map<DateTime, Marker?> shownMarkersMap = {};
-  // Map<DateTime, Marker> _allMarkersMap = {};
   double sliderValue = 0.0;
+
+  var sliderValueMap = {
+    0.0: 'Today',
+    1.0: 'Last 7 days',
+    2.0: 'Last 30 days',
+  };
 
   Future _onMapCreated(GoogleMapController controller) async {
     setState(() {
       _markers = allMarkers;
-      // shownMarkers = allMarkers;
-      // _allMarkersMap = allMarkersMap;
     });
     mapController = controller;
 
@@ -52,7 +52,6 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
   @override
   Widget build(BuildContext context) {
     // final currentDate = DateFormat.yMMMd().add_jms().format(DateTime.now());
-    // print(allMarkersMap.keys.length);
 
     return Stack(
       children: [
@@ -71,27 +70,14 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
           child: Slider(
             inactiveColor: Colors.grey,
             activeColor: Colors.amber,
-            max: 5,
-            divisions: 5,
-            label: 'Last 30 days',
+            max: 2,
+            divisions: 2,
+            label: sliderValueMap[sliderValue],
             value: sliderValue,
             onChanged: (double value) {
               if (value == 5) {
-                /* setState(
-                  () {
-                    for (var marker in _allMarkersMap.keys) {
-                      print(marker);
-                      if (marker.isAfter(
-                          DateTime.now().subtract(const Duration(days: 30)))) {
-                        shownMarkersMap[marker] = _allMarkersMap[marker];
-                      }
-                    }
-                  },
-                ); */
               } else {
-                setState(() {
-                  /* shownMarkers = _allMarkersMap.values.toSet(); */
-                });
+                setState(() {});
               }
               setState(() {
                 sliderValue = value;
