@@ -207,37 +207,6 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                       allMarkers.clear();
                       allMarkersMap.clear();
 
-                      /* FirebaseFirestore.instance
-                          .collection('earthquakes')
-                          .get()
-                          .then(
-                            (res) => res.docs.forEach(
-                              (doc) {
-                                allMarkers.add(
-                                  Marker(
-                                    markerId: MarkerId(doc.get('id')),
-                                    position: LatLng(doc.get('coordinates')[1],
-                                        doc.get('coordinates')[0]),
-                                    icon: BitmapDescriptor.defaultMarkerWithHue(
-                                      doc.get('mag') > 6
-                                          ? BitmapDescriptor.hueRed
-                                          : doc.get('mag') > 5
-                                              ? BitmapDescriptor.hueOrange
-                                              : doc.get('mag') > 4
-                                                  ? BitmapDescriptor.hueYellow
-                                                  : BitmapDescriptor.hueGreen,
-                                    ),
-                                    infoWindow: InfoWindow(
-                                      title: doc.get('place'),
-                                      snippet:
-                                          '${doc.get('mag').toString()}  -  ${doc.get('time')}',
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ); */
-
                       FirebaseFirestore.instance
                           .collection('earthquakes')
                           .get()
@@ -267,15 +236,17 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                             ),
                           );
 
-                      // allMarkers.addAll(allMarkersMap.values);
-
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 5.0),
                         child: ListTile(
                           title: Text(firebaseData['place']),
-                          subtitle: Text(
-                            firebaseData['time'].toString(),
-                          ),
+                          subtitle: Text(DateFormat.yMMMd()
+                              .add_jms()
+                              .format(
+                                DateFormat("yyyy-MM-dd hh:mm:ss")
+                                    .parse(firebaseData['time']),
+                              )
+                              .toString()),
                           trailing: SizedBox(
                             child: DecoratedBox(
                               decoration: BoxDecoration(
