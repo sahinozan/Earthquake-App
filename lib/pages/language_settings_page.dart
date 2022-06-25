@@ -20,7 +20,8 @@ class _LanguageSettingsPageState extends ConsumerState<LanguageSettingsPage> {
     );
     final isDarkMode = ref.watch(darkThemeProvider);
     final languages = ['English', 'Turkish'];
-    final selectedRadioButton = ref.watch(languageSettingsButtonProvider.notifier);
+    final selectedRadioButton =
+        ref.watch(languageSettingsButtonProvider.notifier);
     int selectedItem = ref.watch(indexProvider.notifier).state;
 
     return Scaffold(

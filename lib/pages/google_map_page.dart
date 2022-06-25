@@ -38,7 +38,7 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: ref.watch(selectedMarkerProvider),
-            zoom: 3.0,
+            zoom: 5.0,
           ),
         ),
       );
