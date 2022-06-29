@@ -20,6 +20,10 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
   Map<String, Marker?> _shownMarkersMap = {};
   double sliderValue = 0.0;
 
+  // In my opinion, circles are better representation of earthquakes. (according to their magnitudes)
+  // But for some reason circles will not show up on the map.
+  // I will try to implement it in the summer break.
+
   var sliderValueMap = {
     0.0: 'Last 15 days',
     1.0: 'Last 7 days',
@@ -92,8 +96,8 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
               } else if (value == 1) {
                 for (final m in _markersMap.keys) {
                   if (DateTime.now().difference(
-                              DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
-                          const Duration(days: 15)) {
+                          DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
+                      const Duration(days: 15)) {
                     tempMarkersMap[m] = _markersMap[m];
                   }
                 }
@@ -103,8 +107,8 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
               } else if (value == 2) {
                 for (final m in _markersMap.keys) {
                   if (DateTime.now().difference(
-                              DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
-                          const Duration(days: 7)) {
+                          DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
+                      const Duration(days: 7)) {
                     tempMarkersMap[m] = _markersMap[m];
                   }
                 }

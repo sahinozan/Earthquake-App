@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 part 'earthquake.freezed.dart';
 part 'earthquake.g.dart';
 
+// I created the class fields(their types and names) by looking at the USGS API Documentation.
+
 @freezed
 class Earthquake with _$Earthquake {
   const factory Earthquake({
