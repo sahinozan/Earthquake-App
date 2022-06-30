@@ -1,3 +1,6 @@
+// github.com/sahinozan/Earthquake-App
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'pages/my_home_page.dart';
@@ -16,6 +19,7 @@ Future<void> main() async {
       child: MyApp(),
     ),
   );
+   GestureBinding.instance.resamplingEnabled = true;
 }
 
 class MyApp extends ConsumerStatefulWidget {
