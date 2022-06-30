@@ -79,6 +79,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
   void initState() {
     super.initState();
     futureEarthquake = fetchEarthquake();
+    getMarkers();
   }
 
   Color magnitudeColors(double mag) {
@@ -91,6 +92,35 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
     } else {
       return Colors.red;
     }
+  }
+
+  Future getMarkers() async {
+    await FirebaseFirestore.instance.collection('earthquakes').get().then(
+          (res) => res.docs.forEach(
+            (doc) {
+              allMarkersMap[doc['time']] = Marker(
+                markerId: MarkerId(doc.get('id')),
+                position: LatLng(
+                    doc.get('coordinates')[1], doc.get('coordinates')[0]),
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                  doc.get('mag') > 6
+                      ? BitmapDescriptor.hueRed
+                      : doc.get('mag') > 5
+                          ? BitmapDescriptor.hueOrange
+                          : doc.get('mag') > 4
+                              ? BitmapDescriptor.hueYellow
+                              : BitmapDescriptor.hueGreen,
+                ),
+                infoWindow: InfoWindow(
+                  title: doc.get('place'),
+                  snippet:
+                      '${doc.get('mag').toString()}  -  ${DateFormat.yMMMd().add_jms().format(DateFormat("yyyy-MM-dd hh:mm:ss").parse(doc.get('time')))}',
+                ),
+              );
+            },
+          ),
+        );
+    return const CircularProgressIndicator();
   }
 
   @override
@@ -158,162 +188,141 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
         ],
       ),
       body: Center(
-        child: StreamBuilder<Earthquake>(
-          stream: futureEarthquake.asStream(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return RefreshIndicator(
-                onRefresh: () async {
-                  await futureEarthquake;
-                  setState(() {});
-                },
-                child: ListView.builder(
-                  itemBuilder: (BuildContext context, int index) {
-                    var shortPlace = 'Unknown';
-                    if (snapshot.data!.features[index].properties.place !=
-                            null &&
-                        !snapshot.data!.features[index].properties.place!
-                            .contains('?')) {
-                      shortPlace = snapshot
-                          .data!.features[index].properties.place
-                          .toString();
+        child: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {
+              futureEarthquake = fetchEarthquake();
+            });
+          },
+          child: StreamBuilder<Earthquake>(
+            stream: futureEarthquake.asStream(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await futureEarthquake;
+                    setState(() {});
+                  },
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    addAutomaticKeepAlives: true,
+                    itemBuilder: (BuildContext context, int index) {
+                      var shortPlace = 'Unknown';
+                      if (snapshot.data!.features[index].properties.place !=
+                              null &&
+                          !snapshot.data!.features[index].properties.place!
+                              .contains('?')) {
+                        shortPlace = snapshot
+                            .data!.features[index].properties.place
+                            .toString();
 
-                      if (shortPlace.contains(' of ')) {
-                        shortPlace = shortPlace.split(' of ')[1];
-                      }
-                      shortPlace =
-                          shortPlace[0].toUpperCase() + shortPlace.substring(1);
+                        if (shortPlace.contains(' of ')) {
+                          shortPlace = shortPlace.split(' of ')[1];
+                        }
+                        shortPlace = shortPlace[0].toUpperCase() +
+                            shortPlace.substring(1);
 
-                      // My attempt to add my data objects directly to Firestore by using converter was unsuccessful.
-                      Map<String, dynamic> firebaseData = {
-                        'coordinates': [
-                          snapshot
-                              .data?.features[index].geometry.coordinates[0],
-                          snapshot
-                              .data?.features[index].geometry.coordinates[1],
-                        ],
-                        'id': snapshot.data?.features[index].id,
-                        'mag': snapshot.data?.features[index].properties.mag,
-                        'place': shortPlace,
-                        'time': DateFormat("yyyy-MM-dd hh:mm:ss").format(
-                          DateTime.fromMillisecondsSinceEpoch(
-                            snapshot.data!.features[index].properties.time,
-                          ),
-                        ),
-                        'depth': snapshot
-                            .data!.features[index].geometry.coordinates[2],
-                      };
-
-                      // The code below should normally work in my opinion but I guess it doesn't because of the way that I have implemented my freezed data class.
-
-                      /* final collection = FirebaseFirestore.instance
-                          .collection('earthquakes')
-                          .withConverter<Earthquake>(
-                              fromFirestore: (snapshot, _) =>
-                                  Earthquake.fromJson(snapshot.data()!),
-                              toFirestore: (e, _) => e.toJson()); */
-
-                      // I will try to implement this in the summer break when I have free time.
-
-                      FirebaseFirestore.instance
-                          .collection('earthquakes')
-                          .doc()
-                          .set(firebaseData);
-
-                      allMarkers.clear();
-                      allMarkersMap.clear();
-
-                      FirebaseFirestore.instance
-                          .collection('earthquakes')
-                          .get()
-                          .then(
-                            (res) => res.docs.forEach(
-                              (doc) {
-                                allMarkersMap[doc['time']] = Marker(
-                                  markerId: MarkerId(doc.get('id')),
-                                  position: LatLng(doc.get('coordinates')[1],
-                                      doc.get('coordinates')[0]),
-                                  icon: BitmapDescriptor.defaultMarkerWithHue(
-                                    doc.get('mag') > 6
-                                        ? BitmapDescriptor.hueRed
-                                        : doc.get('mag') > 5
-                                            ? BitmapDescriptor.hueOrange
-                                            : doc.get('mag') > 4
-                                                ? BitmapDescriptor.hueYellow
-                                                : BitmapDescriptor.hueGreen,
-                                  ),
-                                  infoWindow: InfoWindow(
-                                    title: doc.get('place'),
-                                    snippet:
-                                        '${doc.get('mag').toString()}  -  ${DateFormat.yMMMd().add_jms().format(DateFormat("yyyy-MM-dd hh:mm:ss").parse(doc.get('time')))}',
-                                  ),
-                                );
-                              },
+                        // My attempt to add my data objects directly to Firestore by using converter was unsuccessful.
+                        Map<String, dynamic> firebaseData = {
+                          'coordinates': [
+                            snapshot
+                                .data?.features[index].geometry.coordinates[0],
+                            snapshot
+                                .data?.features[index].geometry.coordinates[1],
+                          ],
+                          'id': snapshot.data?.features[index].id,
+                          'mag': snapshot.data?.features[index].properties.mag,
+                          'place': shortPlace,
+                          'time': DateFormat("yyyy-MM-dd hh:mm:ss").format(
+                            DateTime.fromMillisecondsSinceEpoch(
+                              snapshot.data!.features[index].properties.time,
                             ),
-                          );
+                          ),
+                          'depth': snapshot
+                              .data!.features[index].geometry.coordinates[2],
+                        };
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5.0),
-                        child: ListTile(
-                          title: Text(firebaseData['place']),
-                          subtitle: Text(DateFormat.yMMMd()
-                              .add_jms()
-                              .format(
-                                DateFormat("yyyy-MM-dd hh:mm:ss")
-                                    .parse(firebaseData['time']),
-                              )
-                              .toString()),
-                          trailing: SizedBox(
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: magnitudeColors(firebaseData['mag']),
-                              ),
-                              child: SizedBox(
-                                width: 50,
-                                height: 50,
-                                child: Center(
-                                  child: Text(
-                                    firebaseData['mag'].toString(),
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.black,
+                        // The code below should normally work in my opinion but I guess it doesn't because of the way that I have implemented my freezed data class.
+
+                        /* final collection = FirebaseFirestore.instance
+                              .collection('earthquakes')
+                              .withConverter<Earthquake>(
+                                  fromFirestore: (snapshot, _) =>
+                                      Earthquake.fromJson(snapshot.data()!),
+                                  toFirestore: (e, _) => e.toJson()); */
+
+                        // I will try to implement this in the summer break when I have free time.
+
+                        FirebaseFirestore.instance
+                            .collection('earthquakes')
+                            .doc()
+                            .set(firebaseData);
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: ListTile(
+                            title: Text(firebaseData['place']),
+                            subtitle: Text(DateFormat.yMMMd()
+                                .add_jms()
+                                .format(
+                                  DateFormat("yyyy-MM-dd hh:mm:ss")
+                                      .parse(firebaseData['time']),
+                                )
+                                .toString()),
+                            trailing: SizedBox(
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: magnitudeColors(firebaseData['mag']),
+                                ),
+                                child: SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: Center(
+                                    child: Text(
+                                      firebaseData['mag'].toString(),
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.black,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
+                            onTap: () {
+                              ref.read(selectedMarkerProvider.notifier).state =
+                                  LatLng(
+                                snapshot.data!.features[index].geometry
+                                    .coordinates[1],
+                                snapshot.data!.features[index].geometry
+                                    .coordinates[0],
+                              );
+                              ref
+                                  .watch(
+                                    bottomNavigationBarProvider.notifier,
+                                  )
+                                  .state = 1;
+                              ref
+                                      .read(selectedMarkerIdProvider.notifier)
+                                      .state =
+                                  MarkerId(snapshot.data!.features[index].id);
+                            },
                           ),
-                          onTap: () {
-                            ref.read(selectedMarkerProvider.notifier).state =
-                                LatLng(
-                              snapshot.data!.features[index].geometry
-                                  .coordinates[1],
-                              snapshot.data!.features[index].geometry
-                                  .coordinates[0],
-                            );
-                            ref
-                                .watch(
-                                  bottomNavigationBarProvider.notifier,
-                                )
-                                .state = 1;
-                            ref.read(selectedMarkerIdProvider.notifier).state =
-                                MarkerId(snapshot.data!.features[index].id);
-                          },
-                        ),
-                      );
-                    }
-                    return Container();
-                  },
-                  itemCount: snapshot.data!.features.length,
-                  // itemCount: 100,
-                ),
-              );
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
-            }
-            return const CircularProgressIndicator();
-          },
+                        );
+                      }
+                      return Container();
+                    },
+                    itemCount: snapshot.data!.features.length,
+                    // itemCount: 100,
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              }
+              return const CircularProgressIndicator();
+            },
+          ),
         ),
       ),
     );
