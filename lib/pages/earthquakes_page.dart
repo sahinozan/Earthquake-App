@@ -204,6 +204,8 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                     setState(() {});
                   },
                   child: ListView.builder(
+                    // I used the physics and addAutomaticKeepAlives to make it smoother when scrolling
+                    // I am not sure if it is really working to be honest
                     physics: const AlwaysScrollableScrollPhysics(),
                     addAutomaticKeepAlives: true,
                     itemBuilder: (BuildContext context, int index) {
