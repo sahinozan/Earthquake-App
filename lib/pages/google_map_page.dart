@@ -82,6 +82,8 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
             onChanged: (double value) {
               Map<String, Marker?> tempMarkersMap = {};
 
+              // for loops below could be replaced with a single loop.
+
               if (value == 0) {
                 for (final m in _markersMap.keys) {
                   if (DateTime.now().difference(
