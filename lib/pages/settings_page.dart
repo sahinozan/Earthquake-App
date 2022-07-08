@@ -1,4 +1,5 @@
 import 'package:earthquake_app/main.dart';
+import 'package:earthquake_app/pages/language_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -24,7 +25,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       (ref) => Theme.of(context).brightness == Brightness.dark,
     );
     final isDarkMode = ref.watch(darkThemeProvider);
-    // final selectedLanguage = ref.watch(languageProvider);
+    final selectedLanguage = ref.watch(languageProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -45,7 +46,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           SettingsSection(
             tiles: [
               // I didn't delete this because I might try to implement multiple languages in the future.
-              /* 
+
               SettingsTile.navigation(
                 title: const Text('Language'),
                 value: Text(selectedLanguage),
@@ -58,8 +59,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ),
                   );
                 },
-              ), 
-              */
+              ),
+
               SettingsTile.switchTile(
                 initialValue: ref.watch(darkModeProvider),
                 onToggle: (value) {
