@@ -79,7 +79,9 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
   void initState() {
     super.initState();
     futureEarthquake = fetchEarthquake();
-    getMarkers();
+    if (allMarkersMap.isEmpty) {
+      getMarkers();
+    }
   }
 
   Color magnitudeColors(double mag) {
@@ -199,27 +201,23 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                 addAutomaticKeepAlives: true,
                 itemBuilder: (BuildContext context, int index) {
                   var shortPlace = 'Unknown';
-                  if (snapshot.data!.features[index].properties.place !=
-                          null &&
+                  if (snapshot.data!.features[index].properties.place != null &&
                       !snapshot.data!.features[index].properties.place!
                           .contains('?')) {
-                    shortPlace = snapshot
-                        .data!.features[index].properties.place
+                    shortPlace = snapshot.data!.features[index].properties.place
                         .toString();
 
                     if (shortPlace.contains(' of ')) {
                       shortPlace = shortPlace.split(' of ')[1];
                     }
-                    shortPlace = shortPlace[0].toUpperCase() +
-                        shortPlace.substring(1);
+                    shortPlace =
+                        shortPlace[0].toUpperCase() + shortPlace.substring(1);
 
                     // My attempt to add my data objects directly to Firestore by using converter was unsuccessful.
                     Map<String, dynamic> firebaseData = {
                       'coordinates': [
-                        snapshot
-                            .data?.features[index].geometry.coordinates[0],
-                        snapshot
-                            .data?.features[index].geometry.coordinates[1],
+                        snapshot.data?.features[index].geometry.coordinates[0],
+                        snapshot.data?.features[index].geometry.coordinates[1],
                       ],
                       'id': snapshot.data?.features[index].id,
                       'mag': snapshot.data?.features[index].properties.mag,
@@ -244,9 +242,14 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
 
                     // I will try to implement this in the summer break when I have free time.
 
-                    FirebaseFirestore.instance
+                    /* FirebaseFirestore.instance
                         .collection('earthquakes')
                         .doc()
+                        .set(firebaseData); */
+
+                    FirebaseFirestore.instance
+                        .collection('earthquakes')
+                        .doc(snapshot.data!.features[index].id)
                         .set(firebaseData);
 
                     return Padding(
@@ -284,19 +287,17 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                         onTap: () {
                           ref.read(selectedMarkerProvider.notifier).state =
                               LatLng(
-                            snapshot.data!.features[index].geometry
-                                .coordinates[1],
-                            snapshot.data!.features[index].geometry
-                                .coordinates[0],
+                            snapshot
+                                .data!.features[index].geometry.coordinates[1],
+                            snapshot
+                                .data!.features[index].geometry.coordinates[0],
                           );
                           ref
                               .watch(
                                 bottomNavigationBarProvider.notifier,
                               )
                               .state = 1;
-                          ref
-                                  .read(selectedMarkerIdProvider.notifier)
-                                  .state =
+                          ref.read(selectedMarkerIdProvider.notifier).state =
                               MarkerId(snapshot.data!.features[index].id);
                         },
                       ),
