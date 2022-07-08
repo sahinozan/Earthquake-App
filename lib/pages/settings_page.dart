@@ -45,8 +45,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         sections: [
           SettingsSection(
             tiles: [
-              // I didn't delete this because I might try to implement multiple languages in the future.
-
               SettingsTile.navigation(
                 title: const Text('Language'),
                 value: Text(selectedLanguage),
@@ -60,7 +58,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   );
                 },
               ),
-
               SettingsTile.switchTile(
                 initialValue: ref.watch(darkModeProvider),
                 onToggle: (value) {
@@ -78,16 +75,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 title: const Text('Dark Mode'),
                 leading: const Icon(Icons.brightness_2),
               ),
-              // I didn't delete this because I might implement this feature to convert earthquake depth information between km and miles. (plan for the summer break)
-              /* 
               SettingsTile.switchTile(
                 initialValue: ref.watch(measurementProvider),
                 onToggle: (value) =>
                     ref.read(measurementProvider.notifier).state = value,
                 title: const Text('Measurement System'),
                 leading: const Icon(Icons.architecture),
-              ), 
-              */
+              ),
               SettingsTile.navigation(
                 title: const Text('Source'),
                 description: const Text('US Geological Survey (USGS)'),
