@@ -9,8 +9,10 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:intl/intl.dart';
 
-Set<Marker> allMarkers = {};
+// Set<Marker> allMarkers = {};
+// Set<Circle> allCircles = {};
 Map<String, Marker> allMarkersMap = {};
+Map<String, Circle> allCirclesMap = {};
 String filter = 'Date';
 bool magAscending = false;
 bool timeAscending = false;
@@ -79,8 +81,8 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
   void initState() {
     super.initState();
     futureEarthquake = fetchEarthquake();
-    if (allMarkersMap.isEmpty) {
-      getMarkers();
+    if (allMarkersMap.isEmpty || allCirclesMap.isEmpty) {
+      getMarkersAndCircles();
     }
   }
 
@@ -96,7 +98,24 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
     }
   }
 
-  Future getMarkers() async {
+  /* Future getCircles() async {
+    await FirebaseFirestore.instance.collection('earthquakes').get().then(
+          (res) => res.docs.forEach(
+            (doc) {
+              allCirclesMap[doc['time']] = Circle(
+                circleId: CircleId(doc.get('id')),
+                center: LatLng(
+                    doc.get('coordinates')[1], doc.get('coordinates')[0]),
+                radius: doc.get('mag') * 20000,
+                strokeColor: Colors.red,
+                strokeWidth: 2,
+              );
+            },
+          ),
+        );
+  } */
+
+  Future getMarkersAndCircles() async {
     await FirebaseFirestore.instance.collection('earthquakes').get().then(
           (res) => res.docs.forEach(
             (doc) {
@@ -118,6 +137,15 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                   snippet:
                       '${doc.get('mag').toString()}  -  ${DateFormat.yMMMd().add_jms().format(DateFormat("yyyy-MM-dd hh:mm:ss").parse(doc.get('time')))}',
                 ),
+              );
+
+              allCirclesMap[doc['time']] = Circle(
+                circleId: CircleId(doc.get('id')),
+                center: LatLng(
+                    doc.get('coordinates')[1], doc.get('coordinates')[0]),
+                radius: doc.get('mag') * 20000,
+                strokeColor: Colors.red,
+                strokeWidth: 2,
               );
             },
           ),
