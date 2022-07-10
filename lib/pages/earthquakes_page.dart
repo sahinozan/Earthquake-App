@@ -10,10 +10,8 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:intl/intl.dart';
 
-// Set<Marker> allMarkers = {};
-// Set<Circle> allCircles = {};
-Map<String, Marker> allMarkersMap = {};
-Map<String, Circle> allCirclesMap = {};
+Map<DateTime, Marker> allMarkersMap = {};
+Map<DateTime, Circle> allCirclesMap = {};
 String filter = 'Date';
 bool magAscending = false;
 bool timeAscending = false;
@@ -100,7 +98,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
     await FirebaseFirestore.instance.collection('earthquakes').get().then(
           (res) => res.docs.forEach(
             (doc) {
-              allMarkersMap[DateFormat.yMMMd().add_jms().format(DateTime.fromMillisecondsSinceEpoch(doc['properties']['time'])).toString()] = Marker(
+              allMarkersMap[DateTime.fromMicrosecondsSinceEpoch(doc['properties']['time'] * 1000)] = Marker(
                 markerId: MarkerId(doc['id']),
                 position: LatLng(doc['geometry']['coordinates'][1],
                     doc['geometry']['coordinates'][0]),
@@ -120,7 +118,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                 ),
               );
 
-              allCirclesMap[DateFormat.yMMMd().add_jms().format(DateTime.fromMillisecondsSinceEpoch(doc['properties']['time'])).toString()] = Circle(
+              allCirclesMap[DateTime.fromMicrosecondsSinceEpoch(doc['properties']['time'] * 1000)] = Circle(
                 circleId: CircleId(doc['id']),
                 center: LatLng(doc['geometry']['coordinates'][1],
                     doc['geometry']['coordinates'][0]),
