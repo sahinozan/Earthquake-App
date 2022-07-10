@@ -18,6 +18,8 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
   late GoogleMapController mapController;
   Map<String, Marker> _markersMap = {};
   Map<String, Marker?> _shownMarkersMap = {};
+  Map<String, Circle> _circlesMap = {};
+  Map<String, Circle?> _shownCirclesMap = {};
   double sliderValue = 0.0;
 
   // In my opinion, circles are better representation of earthquakes. (according to their magnitudes)
@@ -34,6 +36,8 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
     setState(() {
       _markersMap = allMarkersMap;
       _shownMarkersMap = allMarkersMap;
+      _circlesMap = allCirclesMap;
+      _shownCirclesMap = allCirclesMap;
     });
     mapController = controller;
 
@@ -67,6 +71,7 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
             zoom: 1.0,
           ),
           markers: Set<Marker>.from(_shownMarkersMap.values),
+          circles: Set<Circle>.from(_shownCirclesMap.values),
         ),
         Positioned(
           bottom: 30,
@@ -80,6 +85,49 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
             label: sliderValueMap[sliderValue],
             value: sliderValue,
             onChanged: (double value) {
+              Map<String, Circle?> tempCirclesMap = {};
+
+              // for loops below could be replaced with a single loop.
+
+              if (value == 0) {
+                for (final m in _circlesMap.keys) {
+                  if (DateTime.now().difference(
+                          DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
+                      const Duration(days: 1)) {
+                    tempCirclesMap[m] = _circlesMap[m];
+                  }
+                }
+                setState(() {
+                  _shownCirclesMap = tempCirclesMap;
+                });
+              } else if (value == 1) {
+                for (final m in _circlesMap.keys) {
+                  if (DateTime.now().difference(
+                          DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
+                      const Duration(days: 15)) {
+                    tempCirclesMap[m] = _circlesMap[m];
+                  }
+                }
+                setState(() {
+                  _shownCirclesMap = tempCirclesMap;
+                });
+              } else if (value == 2) {
+                for (final m in _circlesMap.keys) {
+                  if (DateTime.now().difference(
+                          DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
+                      const Duration(days: 7)) {
+                        tempCirclesMap[m] = _circlesMap[m];
+                  }
+                }
+                setState(() {
+                  _shownCirclesMap = tempCirclesMap;
+                });
+              }
+              setState(() {
+                sliderValue = value;
+              });
+            },
+            /* onChanged: (double value) {
               Map<String, Marker?> tempMarkersMap = {};
 
               // for loops below could be replaced with a single loop.
@@ -121,7 +169,7 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
               setState(() {
                 sliderValue = value;
               });
-            },
+            }, */
           ),
         ),
       ],
