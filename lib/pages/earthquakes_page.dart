@@ -96,52 +96,35 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
     }
   }
 
-  /* Future getCircles() async {
-    await FirebaseFirestore.instance.collection('earthquakes').get().then(
-          (res) => res.docs.forEach(
-            (doc) {
-              allCirclesMap[doc['time']] = Circle(
-                circleId: CircleId(doc.get('id')),
-                center: LatLng(
-                    doc.get('coordinates')[1], doc.get('coordinates')[0]),
-                radius: doc.get('mag') * 20000,
-                strokeColor: Colors.red,
-                strokeWidth: 2,
-              );
-            },
-          ),
-        );
-  } */
-
   Future getMarkersAndCircles() async {
     await FirebaseFirestore.instance.collection('earthquakes').get().then(
           (res) => res.docs.forEach(
             (doc) {
-              allMarkersMap[doc['time']] = Marker(
-                markerId: MarkerId(doc.get('id')),
-                position: LatLng(
-                    doc.get('coordinates')[1], doc.get('coordinates')[0]),
+              allMarkersMap[DateFormat.yMMMd().add_jms().format(DateTime.fromMillisecondsSinceEpoch(doc['properties']['time'])).toString()] = Marker(
+                markerId: MarkerId(doc['id']),
+                position: LatLng(doc['geometry']['coordinates'][1],
+                    doc['geometry']['coordinates'][0]),
                 icon: BitmapDescriptor.defaultMarkerWithHue(
-                  doc.get('mag') > 6
+                  doc['properties']['mag'] > 6
                       ? BitmapDescriptor.hueRed
-                      : doc.get('mag') > 5
+                      : doc['properties']['mag'] > 5
                           ? BitmapDescriptor.hueOrange
-                          : doc.get('mag') > 4
+                          : doc['properties']['mag'] > 4
                               ? BitmapDescriptor.hueYellow
                               : BitmapDescriptor.hueGreen,
                 ),
                 infoWindow: InfoWindow(
-                  title: doc.get('place'),
+                  title: doc['properties']['place'],
                   snippet:
-                      '${doc.get('mag').toString()}  -  ${DateFormat.yMMMd().add_jms().format(DateFormat("yyyy-MM-dd hh:mm:ss").parse(doc.get('time')))}',
+                      '${doc['properties']['mag'].toString()}  -  ${DateFormat.yMMMd().add_jms().format(DateTime.fromMillisecondsSinceEpoch(doc['properties']['time']))}',
                 ),
               );
 
-              allCirclesMap[doc['time']] = Circle(
-                circleId: CircleId(doc.get('id')),
-                center: LatLng(
-                    doc.get('coordinates')[1], doc.get('coordinates')[0]),
-                radius: doc.get('mag') * 20000,
+              allCirclesMap[DateFormat.yMMMd().add_jms().format(DateTime.fromMillisecondsSinceEpoch(doc['properties']['time'])).toString()] = Circle(
+                circleId: CircleId(doc['id']),
+                center: LatLng(doc['geometry']['coordinates'][1],
+                    doc['geometry']['coordinates'][0]),
+                radius: doc['properties']['mag'] * 20000,
                 strokeColor: Colors.red,
                 strokeWidth: 2,
               );
@@ -237,10 +220,11 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                     shortPlace =
                         shortPlace[0].toUpperCase() + shortPlace.substring(1);
 
-                    Map<String, dynamic> firebaseData = {
+                    /* Map<String, dynamic> firebaseData = {
                       'coordinates': [
                         snapshot.data?.features[index].geometry.coordinates[0],
                         snapshot.data?.features[index].geometry.coordinates[1],
+                        snapshot.data?.features[index].geometry.coordinates[2],
                       ],
                       'id': snapshot.data?.features[index].id,
                       'mag': snapshot.data?.features[index].properties.mag,
@@ -250,54 +234,58 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                           snapshot.data!.features[index].properties.time,
                         ),
                       ),
-                      'depth': snapshot
-                          .data!.features[index].geometry.coordinates[2],
-                    };
+                    }; */
 
-                    /* final collection = FirebaseFirestore.instance
-                          .collection('earthquakes')
-                          .withConverter<Earthquake>(
-                              fromFirestore: (snapshot, _) =>
-                                  Earthquake.fromJson(snapshot.data()!),
-                              toFirestore: (e, _) => e.toJson()); */
+                    final collection = FirebaseFirestore.instance
+                        .collection('earthquakes')
+                        .doc(snapshot.data!.features[index].id)
+                        .withConverter<Feature>(
+                            fromFirestore: (snapshot, _) =>
+                                Feature.fromJson(snapshot.data()!),
+                            toFirestore: (e, _) => e.toJson());
+
+                    collection.set(snapshot.data!.features[index]);
 
                     /* FirebaseFirestore.instance
                         .collection('earthquakes')
-                        .doc()
+                        .doc(snapshot.data!.features[index].id)
                         .set(firebaseData); */
 
-                    FirebaseFirestore.instance
-                        .collection('earthquakes')
-                        .doc(snapshot.data!.features[index].id)
-                        .set(firebaseData);
-
                     var depthInfo = ref.watch(measurementProvider) == false
-                        ? '${firebaseData['depth']} km'
-                        : '${(firebaseData['depth'] * 0.621371).toStringAsFixed(2)} mi';
+                        ? '${snapshot.data!.features[index].geometry.coordinates[2]} km'
+                        : '${(snapshot.data!.features[index].geometry.coordinates[2] * 0.621371).toStringAsFixed(2)} mi';
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
                       child: ListTile(
-                        title: Text(firebaseData['place']),
-                        subtitle: Text('${DateFormat.yMMMd().add_jms().format(
-                              DateFormat("yyyy-MM-dd hh:mm:ss")
-                                  .parse(firebaseData['time']),
-                            ).toString()}  -  $depthInfo'),
+                        title: Text(
+                          shortPlace,
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
+                        ),
+                        subtitle:
+                            Text('${DateFormat.yMMMd().add_jms().format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                            snapshot.data!.features[index].properties.time,
+                          ),
+                        )}  -  $depthInfo'),
                         trailing: SizedBox(
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              color: magnitudeColors(firebaseData['mag']),
+                              color: magnitudeColors(snapshot
+                                  .data!.features[index].properties.mag),
                             ),
                             child: SizedBox(
                               width: 50,
                               height: 50,
                               child: Center(
                                 child: Text(
-                                  firebaseData['mag'].toString(),
+                                  snapshot.data!.features[index].properties.mag
+                                      .toString(),
                                   style: const TextStyle(
                                     fontSize: 20,
-                                    color: Colors.black,
                                   ),
                                 ),
                               ),
