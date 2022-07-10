@@ -3,7 +3,6 @@ import 'package:earthquake_app/pages/my_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
 
 class GoogleMapPage extends ConsumerStatefulWidget {
   const GoogleMapPage({
@@ -16,10 +15,10 @@ class GoogleMapPage extends ConsumerStatefulWidget {
 
 class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
   late GoogleMapController mapController;
-  Map<String, Marker> _markersMap = {};
-  Map<String, Marker?> _shownMarkersMap = {};
-  Map<String, Circle> _circlesMap = {};
-  Map<String, Circle?> _shownCirclesMap = {};
+  Map<DateTime, Marker> _markersMap = {};
+  Map<DateTime, Marker?> _shownMarkersMap = {};
+  Map<DateTime, Circle> _circlesMap = {};
+  Map<DateTime, Circle?> _shownCirclesMap = {};
   double sliderValue = 0.0;
 
   var sliderValueMap = {
@@ -81,41 +80,61 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
             label: sliderValueMap[sliderValue],
             value: sliderValue,
             onChanged: (double value) {
-              Map<String, Circle?> tempCirclesMap = {};
+              Map<DateTime, Marker?> tempMarkersMap = {};
+              Map<DateTime, Circle?> tempCirclesMap = {};
 
               // for loops below could be replaced with a single loop.
 
               if (value == 0) {
-                for (final m in _circlesMap.keys) {
+                for (final m in _markersMap.keys) {
                   if (DateTime.now().difference(
-                          DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
+                          m) <=
                       const Duration(days: 1)) {
+                    tempMarkersMap[m] = _markersMap[m];
+                  }
+                }
+                for (final m in _circlesMap.keys) {
+                  if (DateTime.now().difference(m) <= const Duration(days: 1)) {
                     tempCirclesMap[m] = _circlesMap[m];
                   }
                 }
                 setState(() {
+                  _shownMarkersMap = _markersMap;
                   _shownCirclesMap = tempCirclesMap;
                 });
               } else if (value == 1) {
-                for (final m in _circlesMap.keys) {
+                for (final m in _markersMap.keys) {
                   if (DateTime.now().difference(
-                          DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
+                          m) <=
+                      const Duration(days: 15)) {
+                    tempMarkersMap[m] = _markersMap[m];
+                  }
+                }
+                for (final m in _circlesMap.keys) {
+                  if (DateTime.now().difference(m) <=
                       const Duration(days: 15)) {
                     tempCirclesMap[m] = _circlesMap[m];
                   }
                 }
                 setState(() {
-                  _shownCirclesMap = tempCirclesMap;
+                  _shownMarkersMap = tempMarkersMap;
+                   _shownCirclesMap = tempCirclesMap;
                 });
               } else if (value == 2) {
-                for (final m in _circlesMap.keys) {
+                for (final m in _markersMap.keys) {
                   if (DateTime.now().difference(
-                          DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
+                          m) <=
                       const Duration(days: 7)) {
-                        tempCirclesMap[m] = _circlesMap[m];
+                    tempMarkersMap[m] = _markersMap[m];
+                  }
+                }
+                for (final m in _circlesMap.keys) {
+                  if (DateTime.now().difference(m) <= const Duration(days: 7)) {
+                    tempCirclesMap[m] = _circlesMap[m];
                   }
                 }
                 setState(() {
+                  _shownMarkersMap = tempMarkersMap;
                   _shownCirclesMap = tempCirclesMap;
                 });
               }
@@ -123,49 +142,6 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
                 sliderValue = value;
               });
             },
-            /* onChanged: (double value) {
-              Map<String, Marker?> tempMarkersMap = {};
-
-              // for loops below could be replaced with a single loop.
-
-              if (value == 0) {
-                for (final m in _markersMap.keys) {
-                  if (DateTime.now().difference(
-                          DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
-                      const Duration(days: 1)) {
-                    tempMarkersMap[m] = _markersMap[m];
-                  }
-                }
-                setState(() {
-                  _shownMarkersMap = _markersMap;
-                });
-              } else if (value == 1) {
-                for (final m in _markersMap.keys) {
-                  if (DateTime.now().difference(
-                          DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
-                      const Duration(days: 15)) {
-                    tempMarkersMap[m] = _markersMap[m];
-                  }
-                }
-                setState(() {
-                  _shownMarkersMap = tempMarkersMap;
-                });
-              } else if (value == 2) {
-                for (final m in _markersMap.keys) {
-                  if (DateTime.now().difference(
-                          DateFormat("yyyy-MM-dd hh:mm:ss").parse(m)) <=
-                      const Duration(days: 7)) {
-                    tempMarkersMap[m] = _markersMap[m];
-                  }
-                }
-                setState(() {
-                  _shownMarkersMap = tempMarkersMap;
-                });
-              }
-              setState(() {
-                sliderValue = value;
-              });
-            }, */
           ),
         ),
       ],
