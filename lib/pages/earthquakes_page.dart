@@ -31,9 +31,6 @@ final magIconProvider = StateProvider<bool>((ref) => true);
 final dateIconProvider = StateProvider<bool>((ref) => true);
 var earthquakeList = <Earthquake>[];
 
-// Url manipulation according to the filter clearly could be implemented much aesthetically better.
-// I will try to refactor this part in the summer break.
-
 Future<Earthquake> fetchEarthquake() async {
   var url =
       'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=500';
@@ -223,8 +220,6 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
-                // I used the physics and addAutomaticKeepAlives to make it smoother when scrolling
-                // I am not sure if it is really working to be honest
                 physics: const AlwaysScrollableScrollPhysics(),
                 addAutomaticKeepAlives: true,
                 itemBuilder: (BuildContext context, int index) {
@@ -241,7 +236,6 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                     shortPlace =
                         shortPlace[0].toUpperCase() + shortPlace.substring(1);
 
-                    // My attempt to add my data objects directly to Firestore by using converter was unsuccessful.
                     Map<String, dynamic> firebaseData = {
                       'coordinates': [
                         snapshot.data?.features[index].geometry.coordinates[0],
@@ -259,16 +253,12 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                           .data!.features[index].geometry.coordinates[2],
                     };
 
-                    // The code below should normally work in my opinion but I guess it doesn't because of the way that I have implemented my freezed data class.
-
                     /* final collection = FirebaseFirestore.instance
                           .collection('earthquakes')
                           .withConverter<Earthquake>(
                               fromFirestore: (snapshot, _) =>
                                   Earthquake.fromJson(snapshot.data()!),
                               toFirestore: (e, _) => e.toJson()); */
-
-                    // I will try to implement this in the summer break when I have free time.
 
                     /* FirebaseFirestore.instance
                         .collection('earthquakes')
@@ -284,13 +274,10 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
                       child: ListTile(
                         title: Text(firebaseData['place']),
-                        subtitle: Text(DateFormat.yMMMd()
-                            .add_jms()
-                            .format(
+                        subtitle: Text('${DateFormat.yMMMd().add_jms().format(
                               DateFormat("yyyy-MM-dd hh:mm:ss")
                                   .parse(firebaseData['time']),
-                            )
-                            .toString()),
+                            ).toString()}  -  ${firebaseData['depth']} km'),
                         trailing: SizedBox(
                           child: DecoratedBox(
                             decoration: BoxDecoration(
