@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:earthquake_app/earthquake.dart';
 import 'package:earthquake_app/pages/my_home_page.dart';
+import 'package:earthquake_app/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -270,6 +271,10 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                         .doc(snapshot.data!.features[index].id)
                         .set(firebaseData);
 
+                    var depthInfo = ref.watch(measurementProvider) == false
+                        ? '${firebaseData['depth']} km'
+                        : '${(firebaseData['depth'] * 0.621371).toStringAsFixed(2)} mi';
+
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
                       child: ListTile(
@@ -277,7 +282,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                         subtitle: Text('${DateFormat.yMMMd().add_jms().format(
                               DateFormat("yyyy-MM-dd hh:mm:ss")
                                   .parse(firebaseData['time']),
-                            ).toString()}  -  ${firebaseData['depth']} km'),
+                            ).toString()}  -  $depthInfo'),
                         trailing: SizedBox(
                           child: DecoratedBox(
                             decoration: BoxDecoration(
