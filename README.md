@@ -9,4 +9,4 @@ Help people to get informed about the recent earthquakes.
  - [x] Slider for different timestamps on Google Maps
  - [x] Click and navigate interaction between Google Maps and Earthquake List
  - [x] Add Freezed object(instead of map) to Firestore by using Firestore Converter
- - [] Turkish language support
+ - [ ] Turkish language support
