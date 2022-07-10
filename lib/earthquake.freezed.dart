@@ -170,9 +170,9 @@ abstract class _Earthquake implements Earthquake {
       _$_Earthquake.fromJson;
 
   @override
-  String get type => throw _privateConstructorUsedError;
+  String get type;
   @override
-  List<Feature> get features => throw _privateConstructorUsedError;
+  List<Feature> get features;
   @override
   @JsonKey(ignore: true)
   _$$_EarthquakeCopyWith<_$_Earthquake> get copyWith =>
@@ -365,11 +365,11 @@ abstract class _Feature implements Feature {
   factory _Feature.fromJson(Map<String, dynamic> json) = _$_Feature.fromJson;
 
   @override
-  Properties get properties => throw _privateConstructorUsedError;
+  Properties get properties;
   @override
-  String get id => throw _privateConstructorUsedError;
+  String get id;
   @override
-  Geometry get geometry => throw _privateConstructorUsedError;
+  Geometry get geometry;
   @override
   @JsonKey(ignore: true)
   _$$_FeatureCopyWith<_$_Feature> get copyWith =>
@@ -544,11 +544,11 @@ abstract class _Properties implements Properties {
       _$_Properties.fromJson;
 
   @override
-  double get mag => throw _privateConstructorUsedError;
+  double get mag;
   @override
-  String? get place => throw _privateConstructorUsedError;
+  String? get place;
   @override
-  int get time => throw _privateConstructorUsedError;
+  int get time;
   @override
   @JsonKey(ignore: true)
   _$$_PropertiesCopyWith<_$_Properties> get copyWith =>
@@ -690,7 +690,7 @@ abstract class _Geometry implements Geometry {
   factory _Geometry.fromJson(Map<String, dynamic> json) = _$_Geometry.fromJson;
 
   @override
-  List<double> get coordinates => throw _privateConstructorUsedError;
+  List<double> get coordinates;
   @override
   @JsonKey(ignore: true)
   _$$_GeometryCopyWith<_$_Geometry> get copyWith =>
