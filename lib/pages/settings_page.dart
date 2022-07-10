@@ -80,6 +80,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 onToggle: (value) =>
                     ref.read(measurementProvider.notifier).state = value,
                 title: const Text('Measurement System'),
+                description: const Text('Metric / Imperial'),
                 leading: const Icon(Icons.architecture),
               ),
               SettingsTile.navigation(
