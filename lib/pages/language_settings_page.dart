@@ -2,9 +2,6 @@ import 'package:earthquake_app/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// This page is not currently used in the app because I couldn't find an easy way to implement multiple languages to my app.
-// I still didn't delete this page because I may try to implement multiple languages in the future.
-
 class LanguageSettingsPage extends ConsumerStatefulWidget {
   const LanguageSettingsPage({
     Key? key,

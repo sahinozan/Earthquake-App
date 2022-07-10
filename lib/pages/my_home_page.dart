@@ -29,9 +29,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       const SettingsPage(),
     ];
     return Scaffold(
-      // This animation part is mostly taken from a stackoverflow post (Line 35-45)
-      // https://stackoverflow.com/questions/69881213/flutter-pagetransitionswitcher-is-not-working 
-      // Just made a little modification on the code snippet to make it work with my app
       body: PageTransitionSwitcher(
         transitionBuilder: (child, animation, secondaryAnimation) {
           return SharedAxisTransition(

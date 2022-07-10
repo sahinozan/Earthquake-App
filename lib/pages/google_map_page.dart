@@ -22,10 +22,6 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
   Map<String, Circle?> _shownCirclesMap = {};
   double sliderValue = 0.0;
 
-  // In my opinion, circles are better representation of earthquakes. (according to their magnitudes)
-  // But for some reason circles will not show up on the map.
-  // I will try to implement it in the summer break.
-
   var sliderValueMap = {
     0.0: 'Last 15 days',
     1.0: 'Last 7 days',
