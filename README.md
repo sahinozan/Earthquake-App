@@ -8,5 +8,8 @@ Help people to get informed about the recent earthquakes.
 ## TODO
  - [x] Slider for different timestamps on Google Maps
  - [x] Click and navigate interaction between Google Maps and Earthquake List
- - [x] Add Freezed object(instead of map) to Firestore by using Firestore Converter
+ - [x] Insert Freezed object(instead of map) to Firestore by using Firestore Converter
+ - [x] Metric/Imperial unit conversion for the earthquake depth
+ - [x] Circle markers on Google Maps
+ - [x] iOS support 
  - [ ] Turkish language support
