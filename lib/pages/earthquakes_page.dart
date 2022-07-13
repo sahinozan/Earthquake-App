@@ -15,6 +15,7 @@ Map<DateTime, Circle> allCirclesMap = {};
 String filter = 'Date';
 bool magAscending = false;
 bool timeAscending = false;
+String? url;
 
 Map<bool, Icon> magIcons = {
   true: const Icon(Icons.arrow_drop_down, size: 40),
@@ -29,31 +30,24 @@ Map<bool, Icon> dateIcons = {
 final magIconProvider = StateProvider<bool>((ref) => true);
 final dateIconProvider = StateProvider<bool>((ref) => true);
 var earthquakeList = <Earthquake>[];
+var urlHeader =
+    'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=';
 
 Future<Earthquake> fetchEarthquake() async {
-  var url =
-      'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=500';
-
-  if (filter == 'Date') {
-    if (timeAscending) {
-      url =
-          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time-asc&minmag=4&limit=500';
-    } else {
-      url =
-          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=time&minmag=4&limit=500';
-    }
+  if (timeAscending) {
+    url = '${urlHeader}time-asc&minmag=4&limit=500';
+  } else {
+    url = '${urlHeader}time&minmag=4&limit=500';
   }
   if (filter == 'Magnitude') {
     if (!magAscending) {
-      url =
-          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=magnitude&minmag=4&limit=500';
+      url = '${urlHeader}magnitude&minmag=4&limit=500';
     } else {
-      url =
-          'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&jsonerror=true&eventtype=earthquake&orderby=magnitude-asc&minmag=4&limit=500';
+      url = '${urlHeader}magnitude-asc&minmag=4&limit=500';
     }
   }
 
-  final response = await http.get(Uri.parse(url));
+  final response = await http.get(Uri.parse(url!));
 
   if (response.statusCode == 200) {
     return Earthquake.fromJson(json.decode(response.body));
@@ -76,7 +70,6 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
   @override
   void initState() {
     super.initState();
-    futureEarthquake = fetchEarthquake();
     if (allMarkersMap.isEmpty || allCirclesMap.isEmpty) {
       getMarkersAndCircles();
     }
@@ -98,7 +91,8 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
     await FirebaseFirestore.instance.collection('earthquakes').get().then(
           (res) => res.docs.forEach(
             (doc) {
-              allMarkersMap[DateTime.fromMicrosecondsSinceEpoch(doc['properties']['time'] * 1000)] = Marker(
+              allMarkersMap[DateTime.fromMicrosecondsSinceEpoch(
+                  doc['properties']['time'] * 1000)] = Marker(
                 markerId: MarkerId(doc['id']),
                 position: LatLng(doc['geometry']['coordinates'][1],
                     doc['geometry']['coordinates'][0]),
@@ -118,7 +112,8 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                 ),
               );
 
-              allCirclesMap[DateTime.fromMicrosecondsSinceEpoch(doc['properties']['time'] * 1000)] = Circle(
+              allCirclesMap[DateTime.fromMicrosecondsSinceEpoch(
+                  doc['properties']['time'] * 1000)] = Circle(
                 circleId: CircleId(doc['id']),
                 center: LatLng(doc['geometry']['coordinates'][1],
                     doc['geometry']['coordinates'][0]),
@@ -218,22 +213,6 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                     shortPlace =
                         shortPlace[0].toUpperCase() + shortPlace.substring(1);
 
-                    /* Map<String, dynamic> firebaseData = {
-                      'coordinates': [
-                        snapshot.data?.features[index].geometry.coordinates[0],
-                        snapshot.data?.features[index].geometry.coordinates[1],
-                        snapshot.data?.features[index].geometry.coordinates[2],
-                      ],
-                      'id': snapshot.data?.features[index].id,
-                      'mag': snapshot.data?.features[index].properties.mag,
-                      'place': shortPlace,
-                      'time': DateFormat("yyyy-MM-dd hh:mm:ss").format(
-                        DateTime.fromMillisecondsSinceEpoch(
-                          snapshot.data!.features[index].properties.time,
-                        ),
-                      ),
-                    }; */
-
                     final collection = FirebaseFirestore.instance
                         .collection('earthquakes')
                         .doc(snapshot.data!.features[index].id)
@@ -243,11 +222,6 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                             toFirestore: (e, _) => e.toJson());
 
                     collection.set(snapshot.data!.features[index]);
-
-                    /* FirebaseFirestore.instance
-                        .collection('earthquakes')
-                        .doc(snapshot.data!.features[index].id)
-                        .set(firebaseData); */
 
                     var depthInfo = ref.watch(measurementProvider) == false
                         ? '${snapshot.data!.features[index].geometry.coordinates[2]} km'
@@ -262,12 +236,11 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
-                        subtitle:
-                            Text('${DateFormat.yMMMd().add_jms().format(
-                          DateTime.fromMillisecondsSinceEpoch(
-                            snapshot.data!.features[index].properties.time,
-                          ),
-                        )}  -  $depthInfo'),
+                        subtitle: Text('${DateFormat.yMMMd().add_jms().format(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                snapshot.data!.features[index].properties.time,
+                              ),
+                            )}  -  $depthInfo'),
                         trailing: SizedBox(
                           child: DecoratedBox(
                             decoration: BoxDecoration(

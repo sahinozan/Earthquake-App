@@ -83,8 +83,6 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
               Map<DateTime, Marker?> tempMarkersMap = {};
               Map<DateTime, Circle?> tempCirclesMap = {};
 
-              // for loops below could be replaced with a single loop.
-
               if (value == 0) {
                 for (final m in _markersMap.keys) {
                   if (DateTime.now().difference(
@@ -102,6 +100,7 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
                   _shownMarkersMap = _markersMap;
                   _shownCirclesMap = tempCirclesMap;
                 });
+                
               } else if (value == 1) {
                 for (final m in _markersMap.keys) {
                   if (DateTime.now().difference(
