@@ -69,6 +69,41 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
           circles: Set<Circle>.from(_shownCirclesMap.values),
         ),
         Positioned(
+          bottom: 40,
+          left: 10,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: const BorderRadius.all(
+                Radius.circular(3),
+              ),
+            ),
+            child: SizedBox(
+              width: 40,
+              height: 40,
+              child: Center(
+                child: IconButton(
+                  icon: const Icon(Icons.info),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return const AlertDialog(
+                          title: Text('Earthquakes'),
+                          content: Text(
+                            'Earthquakes are the most common type of seismic activity. They are caused by the movement of the earth\'s crust and are usually felt by the people of the earth\'s surface. Earthquakes are also known as seismic waves.\n\nEarthquakes are caused by the movement of the earth\'s crust and are usually felt by the people of the earth\'s surface. Earthquakes are also known as seismic waves.',
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
           bottom: 30,
           left: MediaQuery.of(context).size.width * 0.2,
           right: MediaQuery.of(context).size.width * 0.2,
@@ -85,9 +120,7 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
 
               if (value == 0) {
                 for (final m in _markersMap.keys) {
-                  if (DateTime.now().difference(
-                          m) <=
-                      const Duration(days: 1)) {
+                  if (DateTime.now().difference(m) <= const Duration(days: 1)) {
                     tempMarkersMap[m] = _markersMap[m];
                   }
                 }
@@ -100,11 +133,9 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
                   _shownMarkersMap = _markersMap;
                   _shownCirclesMap = tempCirclesMap;
                 });
-                
               } else if (value == 1) {
                 for (final m in _markersMap.keys) {
-                  if (DateTime.now().difference(
-                          m) <=
+                  if (DateTime.now().difference(m) <=
                       const Duration(days: 15)) {
                     tempMarkersMap[m] = _markersMap[m];
                   }
@@ -117,13 +148,11 @@ class _GoogleMapPageConsumerState extends ConsumerState<GoogleMapPage> {
                 }
                 setState(() {
                   _shownMarkersMap = tempMarkersMap;
-                   _shownCirclesMap = tempCirclesMap;
+                  _shownCirclesMap = tempCirclesMap;
                 });
               } else if (value == 2) {
                 for (final m in _markersMap.keys) {
-                  if (DateTime.now().difference(
-                          m) <=
-                      const Duration(days: 7)) {
+                  if (DateTime.now().difference(m) <= const Duration(days: 7)) {
                     tempMarkersMap[m] = _markersMap[m];
                   }
                 }
