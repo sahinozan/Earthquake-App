@@ -151,6 +151,7 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
+            splashRadius: 20,
             onPressed: () {
               showMenu(
                 context: context,
@@ -261,73 +262,84 @@ class _EarthquakesPageState extends ConsumerState<EarthquakesPage> {
                         ? '${snapshot.data!.features[index].geometry.coordinates[2]} km'
                         : '${(snapshot.data!.features[index].geometry.coordinates[2] * 0.621371).toStringAsFixed(2)} mi';
 
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                    return Theme(
+                      data: ThemeData(
+                        // splashColor: Colors.transparent,
+                        splashFactory: InkRipple.splashFactory,
+                        highlightColor: Colors.transparent,
                       ),
-                      margin: const EdgeInsets.symmetric(
-                        vertical: 5,
-                        horizontal: 10,
-                      ),
-                      elevation: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5.0),
-                        child: ListTile(
-                          title: Text(
-                            shortPlace,
-                            style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
-                            ),
-                          ),
-                          subtitle: Text('${DateFormat.yMMMd().add_jms().format(
-                                DateTime.fromMillisecondsSinceEpoch(
-                                  snapshot
-                                      .data!.features[index].properties.time,
-                                ),
-                              )}  -  $depthInfo'),
-                          trailing: SizedBox(
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: magnitudeColors(snapshot
-                                    .data!.features[index].properties.mag),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        margin: const EdgeInsets.symmetric(
+                          vertical: 5,
+                          horizontal: 10,
+                        ),
+                        elevation: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: ListTile(
+                            onLongPress: () => {},
+                            title: Text(
+                              shortPlace,
+                              style: TextStyle(
+                                color: isDarkMode ? Colors.white : Colors.black,
                               ),
-                              child: SizedBox(
-                                width: 50,
-                                height: 50,
-                                child: Center(
-                                  child: Text(
-                                    snapshot
-                                        .data!.features[index].properties.mag
-                                        .toString(),
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      foreground: Paint()
-                                        ..style = PaintingStyle.fill
-                                        ..strokeWidth = 1
-                                        ..color = Colors.black,
+                            ),
+                            subtitle:
+                                Text('${DateFormat.yMMMd().add_jms().format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                        snapshot.data!.features[index]
+                                            .properties.time,
+                                      ),
+                                    )}  -  $depthInfo'),
+                            trailing: SizedBox(
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: magnitudeColors(snapshot
+                                      .data!.features[index].properties.mag),
+                                ),
+                                child: SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: Center(
+                                    child: Text(
+                                      snapshot
+                                          .data!.features[index].properties.mag
+                                          .toString(),
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        foreground: Paint()
+                                          ..style = PaintingStyle.fill
+                                          ..strokeWidth = 1
+                                          ..color = Colors.black,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
+                            onTap: () {
+                              ref.read(selectedMarkerProvider.notifier).state =
+                                  LatLng(
+                                snapshot.data!.features[index].geometry
+                                    .coordinates[1],
+                                snapshot.data!.features[index].geometry
+                                    .coordinates[0],
+                              );
+                              ref
+                                  .watch(
+                                    bottomNavigationBarProvider.notifier,
+                                  )
+                                  .state = 1;
+                              ref
+                                      .read(selectedMarkerIdProvider.notifier)
+                                      .state =
+                                  MarkerId(snapshot.data!.features[index].id);
+                            },
                           ),
-                          onTap: () {
-                            ref.read(selectedMarkerProvider.notifier).state =
-                                LatLng(
-                              snapshot.data!.features[index].geometry
-                                  .coordinates[1],
-                              snapshot.data!.features[index].geometry
-                                  .coordinates[0],
-                            );
-                            ref
-                                .watch(
-                                  bottomNavigationBarProvider.notifier,
-                                )
-                                .state = 1;
-                            ref.read(selectedMarkerIdProvider.notifier).state =
-                                MarkerId(snapshot.data!.features[index].id);
-                          },
                         ),
                       ),
                     );
